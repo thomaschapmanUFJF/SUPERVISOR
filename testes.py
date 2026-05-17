@@ -11,7 +11,6 @@ def calcular_vel_vertical(altitude_atual, altitude_anterior, tempo_atual, tempo_
 def calcular_altitude(gps_altitude, bmp_altitude):
     return (gps_altitude + bmp_altitude) / 2
 
-
 with open('FLIGHT2.csv', 'r') as file:
     reader = csv.reader(file)
     next(reader)

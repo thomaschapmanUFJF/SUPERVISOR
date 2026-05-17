@@ -1,36 +1,33 @@
 class Dados:
     def __init__(self):
         self.time = 0
-        self.status = 0
-        self.pressure = 0.0
-        self.temperature = 0.0
-        self.bmp_altitude = 0
-        self.max_altitude = 0
-        self.accel_x = 0
-        self.accel_y = 0
-        self.accel_z = 0
-        self.rotation_x = 0
-        self.rotation_y = 0
-        self.rotation_z = 0
         self.latitude = 0.0
         self.longitude = 0.0
-        self.gps_altitude = 0.0
+        self.kf_altitude = 0
+        self.kf_apogee = 0
+        self.kf_vel_vertical = 0
+        self.q1 = 0
+        self.q2 = 0
+        self.q3 = 0
+        self.q4 = 0
+        self.accel = 0
+        self.status = 0
         self.voltage = 0
-        
-    def fill_info(self, time, status, pressure, temperature, bmp_altitude, max_altitude, accel_x, accel_y, accel_z, rotation_x, rotation_y, rotation_z, latitude, longitude, gps_altitude, voltage):
+        self.fix = 0    
+    def fill(self,time,latitude,longitude,kf_altitude,kf_apogee,kf_vel_vertical,q1,q2,q3,q4,accel,status,voltage,fix):
         self.time = time
-        self.status = status
-        self.pressure = pressure
-        self.temperature = temperature
-        self.bmp_altitude = bmp_altitude
-        self.max_altitude = max_altitude
-        self.accel_x = accel_x
-        self.accel_y = accel_y
-        self.accel_z = accel_z
-        self.rotation_x = rotation_x
-        self.rotation_y = rotation_y
-        self.rotation_z = rotation_z
         self.latitude = latitude
         self.longitude = longitude
-        self.gps_altitude = gps_altitude
+        self.kf_altitude = kf_altitude
+        self.kf_apogee = kf_apogee
+        self.kf_vel_vertical = kf_vel_vertical
+        self.q1 = q1
+        self.q2 = q2
+        self.q3 = q3
+        self.q4 = q4
+        self.accel = accel
+        self.status = status
         self.voltage = voltage
+        self.fix = fix
+        
+  
