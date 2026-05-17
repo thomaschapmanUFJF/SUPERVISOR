@@ -1,0 +1,3 @@
+CONFIGS = {
+    'BAUDRATE': 9600
+}
