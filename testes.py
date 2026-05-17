@@ -59,5 +59,5 @@ with open('FLIGHT2.csv', 'r') as file:
                         voltage_int,
                         fix)
         
-        altitude_anterior = bmp_altitude
+        altitude_anterior = altitude
         time_anterior = time
