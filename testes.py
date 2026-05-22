@@ -1,5 +1,6 @@
 import csv
 import struct
+import serial
 from configs import CONFIGS
 
 def calcular_accel(accel_x, accel_y, accel_z):
@@ -12,6 +13,7 @@ def calcular_altitude(gps_altitude, bmp_altitude):
     return (gps_altitude + bmp_altitude) / 2
 
 with open('FLIGHT2.csv', 'r') as file:
+    port = serial.Serial(port = r'\\.\COM5', baudrate = CONFIGS.get('BAUDRATE'), timeout = 1)
     reader = csv.reader(file)
     next(reader)
     data = list(reader)
@@ -58,6 +60,6 @@ with open('FLIGHT2.csv', 'r') as file:
                         status,
                         voltage_int,
                         fix)
-        
+        port.write(info)
         altitude_anterior = altitude
         time_anterior = time
