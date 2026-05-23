@@ -1,9 +1,28 @@
-import serial
-import struct
-from configs import CONFIGS
+from Tradutor import Tradutor
+from Escrivao import Escrivao
 
-porta = serial.Serial(port=r'\\.\COM6', baudrate=CONFIGS.get('BAUDRATE'),timeout=1)
-while True:
-    data = porta.read(30)
-    decoded = struct.unpack('<IffHHhHHHHBBBB',data)
-    print(f'tempo atual: {decoded[0]}')
+import sys
+
+tradutor = Tradutor()
+escrivao = Escrivao()
+
+def main():
+    print('INICIANDO...')
+    continua = True
+    while continua:
+        try:
+            row = tradutor.decode_row()
+            escrivao.add_row(row)
+        except TimeoutError:
+            print('ESPERANDO DADOS DO FOGUETE...')
+            continua = False
+        except KeyboardInterrupt:
+            print('TECLADO APERTADO. ENCERRANDO...')
+            continua = False
+            sys.exit(0)
+        except Exception as e:
+            print(f'ERRO INESPERADO: {e}')
+
+if __name__ == '__main__':
+    main()
+    escrivao.save_csv()
