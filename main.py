@@ -1,27 +1,32 @@
 from Tradutor import Tradutor
 from Escrivao import Escrivao
 
-import sys
-
 tradutor = Tradutor()
 escrivao = Escrivao()
 
 def main():
     print('INICIANDO...')
-    continua = True
-    while continua:
+    tentativas = 0
+    rows_recebidas = 0
+    while True:
         try:
             row = tradutor.decode_row()
             escrivao.add_row(row)
+            rows_recebidas += 1
+            if rows_recebidas % 10 == 0:
+                print(f"ROWS RECEBIDAS: {rows_recebidas}")
         except TimeoutError:
             print('ESPERANDO DADOS DO FOGUETE...')
-            continua = False
+            tentativas += 1
+            if tentativas >= 5:
+                print('NENHUM DADO RECEBIDO APÓS 5 TENTATIVAS. ENCERRANDO...')
+                break
         except KeyboardInterrupt:
             print('TECLADO APERTADO. ENCERRANDO...')
-            continua = False
-            sys.exit(0)
+            break
         except Exception as e:
             print(f'ERRO INESPERADO: {e}')
+            break
 
 if __name__ == '__main__':
     main()
