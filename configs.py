@@ -1,4 +1,0 @@
-CONFIGS = {
-    'BAUDRATE': 9600,
-    'MAX_ACCEL': 255
-}
