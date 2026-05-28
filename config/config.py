@@ -29,7 +29,7 @@ CONFIG = {
     'CSV':
     {
         'FILENAME': 'FLIGHT3.csv',
-        'HEADER': [     "time",
+        'HEADER': [ "time",
                     "latitude",
                     "longitude",
                     "altitude",
@@ -46,3 +46,5 @@ CONFIG = {
     },
 
 }
+
+    
