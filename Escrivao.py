@@ -19,8 +19,8 @@ class Escrivao:
 
     def save_csv(self):
         with open(FILENAME, 'w', newline='') as csvfile:
-            writer = csv.write(csvfile, fieldnames=self.header)
-            writer.writeheader()
+            writer = csv.writer(csvfile)
+            writer.writerow(self.header)
             for row in self.csv_data:
                 for collumn in row:
                     writer.writerow(collumn)
