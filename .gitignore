@@ -131,6 +131,9 @@ dmypy.json
 # pytype
 .pytype/
 
+# Node modules
+node_modules/
+
 # Operating system files
 .DS_Store
 .DS_Store?
