@@ -2,23 +2,31 @@
 echo ==============================================
 echo   INICIANDO SISTEMA SUPERVISORIO SUPERNOVA
 echo ==============================================
+echo [1] Iniciando o Servidor de Desenvolvimento do React (Vite)...
+:: Entra na pasta do frontend para rodar o comando do npm
+start "FRONTEND - React" cmd /c "cd app/frontend/front-supernova && npm run dev"
 
-echo [1] Iniciando o Foguete Simulado (testes.py)...
-:: O '/k' diz para o terminal ficar aberto mesmo se der erro, pra você ver o que aconteceu.
-start cmd /k "python -m testes.testes.py"
+timeout /t 3 /nobreak > NUL
+echo [2] Iniciando o Backend e Motor de Leitura (main.py)...
+:: O main.py e o "cerebro" que liga o motor e o servidor web ao mesmo tempo
+start "ESTACAO SOLO - Backend" cmd /k "python main.py"
 
-:: Aguarda 2 segundinhos para dar tempo da porta virtual abrir
+timeout /t 5 /nobreak > NUL
+
+echo [3] Abrindo o Painel no Navegador...
+:: O Vite por padrao usa a porta 5173. 
+:: Se o seu abrir em outra (ex: 3000), altere o numero abaixo.
+start http://localhost:5173
+
 timeout /t 2 /nobreak > NUL
 
-echo [2] Iniciando o Backend da Estacao Solo (main.py)...
-start cmd /k "python main.py"
-
-echo [3] Abrindo o Painel Front-end no Navegador...
-:: Se você estiver usando um arquivo HTML puro na mesma pasta:
-start index.html
-
-:: (Se você fosse usar um servidor web rodando no localhost:8000, seria assim:)
-:: start http://localhost:8000
+echo [4] Iniciando o Foguete Simulado (testes.py)...
+:: Rodando como modulo para garantir que os imports da pasta config funcionem
+start "SIMULADOR - Foguete" cmd /c "python -m testes.testes"
 
 echo ==============================================
-echo Tudo rodando! Pode fechar esta janela preta.
+echo Tudo pronto! Esta janela fechara em 5 segundos.
+echo ==============================================
+
+timeout /t 5 /nobreak
+exit
