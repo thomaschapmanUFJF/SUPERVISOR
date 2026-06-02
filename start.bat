@@ -4,12 +4,12 @@ echo   INICIANDO SISTEMA SUPERVISORIO SUPERNOVA
 echo ==============================================
 echo [1] Iniciando o Servidor de Desenvolvimento do React (Vite)...
 :: Entra na pasta do frontend para rodar o comando do npm
-start "FRONTEND - React" cmd /c "cd app/frontend/front-supernova && npm run dev"
+start "FRONTEND - React" cmd /c "cd app/frontend/front-supervisor && npm run dev"
 
 timeout /t 3 /nobreak > NUL
 echo [2] Iniciando o Backend e Motor de Leitura (main.py)...
 :: O main.py e o "cerebro" que liga o motor e o servidor web ao mesmo tempo
-start "ESTACAO SOLO - Backend" cmd /k "python main.py"
+start "ESTACAO SOLO - Backend" cmd /c "python main.py"
 
 timeout /t 5 /nobreak > NUL
 
