@@ -6,10 +6,10 @@ class Row:
         self.altitude = float(data[3]) / 10  
         self.apogeu = float(data[4]) / 10
         self.vel_vertical = float(data[5]) / 10
-        self.q1 = int(data[6])
-        self.q2 = int(data[7])
-        self.q3 = int(data[8])
-        self.q4 = int(data[9])
+        self.q1 = float(data[6])
+        self.q2 = float(data[7])
+        self.q3 = float(data[8])
+        self.q4 = float(data[9])
         self.accel_int = int(data[10])
         self.status = int(data[11])
         self.voltage_int = int(data[12])

@@ -17,7 +17,7 @@ CONFIG = {
     },
     'STRUCT':
     {
-        'FORMAT': '<IffHHhHHHHBBBB'
+        'FORMAT': '<IffHHhffffBBBB'
     },
 
     'TEST':
