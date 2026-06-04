@@ -1,43 +1,25 @@
-import { useState, useEffect } from 'react';
-import FogueteTela from './FogueteTela';
+import { useState, useRef } from 'react';
+import { Canvas } from '@react-three/fiber';
+import GraficoTeste from './GraficoTeste';
+import FogueteModelo from './FogueteModelo';
+import { useTelemetria } from './Telemetria';
+import './WebSocket';
+
 
 export default function App(){
-  const [conectado, setConectado] = useState(false);
-  
-  useEffect(() => {
-    const websocket = new WebSocket('ws://localhost:8000/ws');
-
-    websocket.onopen = () => {
-      setConectado(true);
-      console.log('WebSocket connection established');
-    };
-
-    websocket.onmessage = (event) => {
-      console.log('Received message:', event.data);
-    };
-
-    websocket.onclose = () => {
-      setConectado(false);
-      console.log('WebSocket connection closed');
-    };
-
-    websocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-        console.log('  - Code:', event.code);
-        console.log('  - Reason:', event.reason);
-        console.log('  - Was clean:', event.wasClean);
-    };
-
-    return () => {
-      websocket.close();
-    };
-  },[])
+  const time = useTelemetria((state) => state.atual?.time);
   return (
     <div>
       <h1>Supervisor</h1>
-       <p>WebSocket connection status: {conectado ? 'Connected' : 'Disconnected'}</p>
-       <h1>Canvas</h1>
-      <FogueteTela />
+      <p>Time: {time || 'N/A'}</p>
+      <div style={{ width: '100vw', height: '100vh' }}>
+      <Canvas camera={{ position: [5, 5, 5] }}>
+        <ambientLight intensity={0.5} />
+        <pointLight position={[10, 10, 10]} />
+        <FogueteModelo />
+      </Canvas>
+      <GraficoTeste />
+      </div>
     </div>
   )
 }
