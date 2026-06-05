@@ -1,9 +1,12 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTelemetria } from './Telemetria';
+import { useGLTF } from '@react-three/drei'; 
+
 
 export default function FogueteModelo(){
   const foguete3D = useRef();
+  const { scene } = useGLTF('/foguete.glb');
   useFrame(() => {
     if (!foguete3D.current) return
     const pacote = useTelemetria.getState().atual
@@ -17,14 +20,12 @@ export default function FogueteModelo(){
   })
   return (
     <group ref={foguete3D}>
-      <mesh position={[0, -0.5, 0]}>
-        <cylinderGeometry args={[0.4, 0.4, 1.5, 32]} />
-        <meshStandardMaterial color="red" />
-      </mesh>
-      <mesh position={[0, 0.6, 0]}>
-        <coneGeometry args={[0.4, 1.0, 32]} />
-        <meshStandardMaterial color="orange" />
-      </mesh>
+      <primitive 
+        object={scene} 
+        scale={1}           
+        position={[0, 0, 0]} 
+        rotation={[Math.PI / 2, 0, 0]}
+      />
     </group>
   );
 }
