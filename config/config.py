@@ -15,36 +15,14 @@ CONFIG = {
             'PATH': rf'\\.\{read_port_name}'        
         },
     },
-    'STRUCT':
-    {
-        'FORMAT': '<IffHHhffffBBBB'
-    },
-
     'TEST':
     {
         'CSV_PATH':'FLIGHT2.csv',
         'MAX_ACCEL': 255
     },
-
     'CSV':
     {
         'FILENAME': 'FLIGHT3.csv',
-        'HEADER': [ "time",
-                    "latitude",
-                    "longitude",
-                    "altitude",
-                    "apogeu",
-                    "vel_vertical",
-                    "q1",
-                    "q2",
-                    "q3",
-                    "q4",
-                    "accel_int",
-                    "status",
-                    "voltage_int",
-                    "fix"]
     },
 
 }
-
-    

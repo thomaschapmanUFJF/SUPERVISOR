@@ -5,13 +5,11 @@ import sys
 import math
 import time as time_module
 from config.config import CONFIG
+from schema import FORMAT
 
 # SERIAL SETTINGS
 BAUDRATE = CONFIG['SERIAL']['BAUDRATE']
 WRITE_PORT_PATH = CONFIG['SERIAL']['WRITE_PORT']['PATH']
-
-# STRUCT SETTINGS
-FORMAT = CONFIG['STRUCT']['FORMAT']
 
 # MISC SETTINGS
 MAX_ACCEL = CONFIG['TEST']['MAX_ACCEL']
@@ -52,27 +50,27 @@ def calcular_altitude(gps_altitude, bmp_altitude):
 with open('FLIGHT2.csv', 'r') as file:
     try:    
         port = serial.Serial(port = WRITE_PORT_PATH, baudrate = BAUDRATE, timeout = 1)
-        reader = csv.reader(file)
+        reader = csv.DictReader(file)
         next(reader)
         altitude_anterior = 0
         time_anterior = 0
-        for i,row in enumerate(reader):
-            time = int(row[0])
-            status = int(row[1])
-            pressure = float(row[2])
-            temperature = float(row[3])
-            bmp_altitude = float(row[4])
-            max_altitude = float(row[5])
-            accel_x = float(row[6])
-            accel_y = float(row[7])
-            accel_z = float(row[8])
-            rotation_x = float(row[9])
-            rotation_y = float(row[10])
-            rotation_z = float(row[11])
-            latitude = float(row[12])
-            longitude = float(row[13])
-            gps_altitude = float(row[14])
-            voltage = float(row[15])
+        for row in reader:
+            time = int(row['Time'])
+            status = int(row['Status'])
+            pressure = float(row['Pressure'])
+            temperature = float(row['Temperature'])
+            bmp_altitude = float(row['BMP Altitude'])
+            max_altitude = float(row['Max Altitude'])
+            accel_x = float(row['Accel_X'])
+            accel_y = float(row['Accel_Y'])
+            accel_z = float(row['Accel_Z'])
+            rotation_x = float(row['Rotation_X'])
+            rotation_y = float(row['Rotation_Y'])
+            rotation_z = float(row['Rotation_Z'])
+            latitude = float(row['Latitude'])
+            longitude = float(row['Longitude'])
+            gps_altitude = float(row['GPS Altitude'])
+            voltage = float(row['Voltage'])
             q1, q2, q3, q4 = euler_to_quaternion(rotation_x, rotation_y, rotation_z)
             accel = calcular_accel(accel_x, accel_y, accel_z)
             altitude = calcular_altitude(gps_altitude, bmp_altitude)
@@ -100,7 +98,6 @@ with open('FLIGHT2.csv', 'r') as file:
             altitude_anterior = altitude
             time_anterior = time
             print(time)
-            time_module.sleep(0.05)
     except KeyboardInterrupt:
         print('INTERROMPENDO O SIMULADOR')
         port.close()
