@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
-import GraficoTeste from './GraficoTeste';
+import GraficoBarras from './GraficoBarras';
+import GraficoArea from './GraficoArea';
 import FogueteModelo from './FogueteModelo';
 import { useTelemetria } from './Telemetria';
 import { Suspense } from 'react';
@@ -15,6 +16,7 @@ import './WebSocket';
 export default function App(){
   L.Icon.Default.mergeOptions({ iconUrl, shadowUrl: iconShadow })
   const time = useTelemetria((state) => state.atual?.time);
+  const [chartType, setChartType] = useState('barras');
   return (
     <div className="app-root">
 
@@ -45,8 +47,16 @@ export default function App(){
  
         {/* ── GRÁFICO ── */}
         <section className="card card-chart">
+          <div className="chart-button-group">
+            <button className={chartType === 'barras' ? 'btn-chart active' : 'btn-chart'} onClick={() => setChartType('barras')}>
+              Barras
+            </button>
+            <button className={chartType === 'area' ? 'btn-chart active' : 'btn-chart'} onClick={() => setChartType('area')}>
+              Área
+            </button>
+          </div>
           <div className="card-label">altitude / tempo</div>
-          <GraficoTeste />
+          {chartType === 'barras' ? <GraficoBarras /> : <GraficoArea />}
         </section>
  
         {/* ── MODELO 3D ── */}
