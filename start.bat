@@ -9,7 +9,7 @@ start "FRONTEND - React" cmd /c "cd app/frontend/front-supervisor && npm run dev
 timeout /t 3 /nobreak > NUL
 echo [2] Iniciando o Backend e Motor de Leitura (main.py)...
 :: O main.py e o "cerebro" que liga o motor e o servidor web ao mesmo tempo
-start "ESTACAO SOLO - Backend" cmd /c "python main.py"
+start "ESTACAO SOLO - Backend" cmd /k "python main.py 0"
 
 timeout /t 5 /nobreak > NUL
 
