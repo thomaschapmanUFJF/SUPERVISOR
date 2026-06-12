@@ -291,6 +291,47 @@ body::before {
   text-transform: uppercase;
 }
 
+/* ── CHART BUTTON GROUP ── */
+.chart-button-group {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.btn-chart {
+  background: var(--bg-cell);
+  color: var(--txt-sec);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-chart:hover {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+}
+
+.btn-chart.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  font-weight: 700;
+}
+
+.btn-chart:not(.active) {
+  background: var(--bg-cell);
+  color: var(--txt-sec);
+  border-color: var(--border);
+}
+
 /* ── BARRAS DO GRÁFICO ── */
 .chart-outer {
   background: #000;
