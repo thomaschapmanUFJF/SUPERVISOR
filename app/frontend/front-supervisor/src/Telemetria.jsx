@@ -9,7 +9,7 @@ export const useTelemetria = create((set) => ({
     { 
       atual: telemetria, 
       posicaoAtual: { latitude: telemetria.latitude, longitude: telemetria.longitude },
-      historicoAltitude: [...state.historicoAltitude, { time: telemetria.time, altitude: telemetria.altitude }],
+      historicoAltitude: [...state.historicoAltitude.slice(-99), { time: telemetria.time, altitude: telemetria.altitude }],
       historicoPosicao: [...state.historicoPosicao, { latitude: telemetria.latitude, longitude: telemetria.longitude }],
     }
   )),
