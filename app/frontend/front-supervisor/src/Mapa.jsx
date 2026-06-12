@@ -12,7 +12,7 @@ export default function Mapa() {
       <MapContainer center={[-21.76, -43.38]} zoom={15} style={{ width: '100%', height: '400px' }}>
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <Marker position={[posicaoAtual.latitude, posicaoAtual.longitude]} />
-        <Polyline positions={historicoPosicao.map(p => [p.latitude, p.longitude])} color="#f97316" />
+        <Polyline positions={historicoPosicao.map(p => [p.latitude, p.longitude])} color="#bf00ff" />
         <SeguirFoguete posicao={posicaoAtual} />
       </MapContainer>
     ) : null
