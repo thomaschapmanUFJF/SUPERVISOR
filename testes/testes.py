@@ -47,60 +47,111 @@ def calcular_vel_vertical(altitude_atual, altitude_anterior, tempo_atual, tempo_
 def calcular_altitude(gps_altitude, bmp_altitude):
     return (gps_altitude + bmp_altitude) / 2
 
-with open('FLIGHT2.csv', 'r') as file:
-    try:    
-        port = serial.Serial(port = WRITE_PORT_PATH, baudrate = BAUDRATE, timeout = 1)
-        reader = csv.DictReader(file)
-        next(reader)
-        altitude_anterior = 0
-        time_anterior = 0
-        for row in reader:
-            time = int(row['Time'])
-            status = int(row['Status'])
-            pressure = float(row['Pressure'])
-            temperature = float(row['Temperature'])
-            bmp_altitude = float(row['BMP Altitude'])
-            max_altitude = float(row['Max Altitude'])
-            accel_x = float(row['Accel_X'])
-            accel_y = float(row['Accel_Y'])
-            accel_z = float(row['Accel_Z'])
-            rotation_x = float(row['Rotation_X'])
-            rotation_y = float(row['Rotation_Y'])
-            rotation_z = float(row['Rotation_Z'])
-            latitude = float(row['Latitude'])
-            longitude = float(row['Longitude'])
-            gps_altitude = float(row['GPS Altitude'])
-            voltage = float(row['Voltage'])
-            q1, q2, q3, q4 = euler_to_quaternion(rotation_x, rotation_y, rotation_z)
-            accel = calcular_accel(accel_x, accel_y, accel_z)
-            altitude = calcular_altitude(gps_altitude, bmp_altitude)
-            vel_vertical = calcular_vel_vertical(altitude, altitude_anterior, time, time_anterior)
-            apogeu = max_altitude
-            fix = 0
-            accel_int = max(min(int(accel * 10), MAX_ACCEL),0)
-            voltage_int = int(voltage * 10)
-            info = struct.pack(FORMAT,
-                            time,
-                            latitude,
-                            longitude,
-                            int(altitude * 10),
-                            int(apogeu * 10),
-                            int(vel_vertical * 10),
-                            q1,
-                            q2,
-                            q3,
-                            q4,
-                            accel_int,
-                            status,
-                            voltage_int,
-                            fix)
-            port.write(info)
-            altitude_anterior = altitude
-            time_anterior = time
-            print(time)
-    except KeyboardInterrupt:
-        print('INTERROMPENDO O SIMULADOR')
-        port.close()
-        sys.exit(0)
-    finally:
-        port.close()
+def through_csv():
+    with open('FLIGHT2.csv', 'r') as file:
+            reader = csv.DictReader(file)
+            next(reader)
+            altitude_anterior = 0
+            time_anterior = 0
+            for row in reader:
+                time = int(row['Time'])
+                status = int(row['Status'])
+                pressure = float(row['Pressure'])
+                temperature = float(row['Temperature'])
+                bmp_altitude = float(row['BMP Altitude'])
+                max_altitude = float(row['Max Altitude'])
+                accel_x = float(row['Accel_X'])
+                accel_y = float(row['Accel_Y'])
+                accel_z = float(row['Accel_Z'])
+                rotation_x = float(row['Rotation_X'])
+                rotation_y = float(row['Rotation_Y'])
+                rotation_z = float(row['Rotation_Z'])
+                latitude = float(row['Latitude'])
+                longitude = float(row['Longitude'])
+                gps_altitude = float(row['GPS Altitude'])
+                voltage = float(row['Voltage'])
+                q1, q2, q3, q4 = euler_to_quaternion(rotation_x, rotation_y, rotation_z)
+                accel = calcular_accel(accel_x, accel_y, accel_z)
+                altitude = calcular_altitude(gps_altitude, bmp_altitude)
+                vel_vertical = calcular_vel_vertical(altitude, altitude_anterior, time, time_anterior)
+                apogeu = max_altitude
+                fix = 0
+                accel_int = max(min(int(accel * 10), MAX_ACCEL),0)
+                voltage_int = int(voltage * 10)
+                info = struct.pack(FORMAT,
+                                time,
+                                latitude,
+                                longitude,
+                                int(altitude * 10),
+                                int(apogeu * 10),
+                                int(vel_vertical * 10),
+                                q1,
+                                q2,
+                                q3,
+                                q4,
+                                accel_int,
+                                status,
+                                voltage_int,
+                                fix)
+                altitude_anterior = altitude
+                time_anterior = time 
+                yield info
+if __name__ == '__main__':
+    with open('FLIGHT2.csv', 'r') as file:
+        try:    
+            port = serial.Serial(port = WRITE_PORT_PATH, baudrate = BAUDRATE, timeout = 1)
+            reader = csv.DictReader(file)
+            next(reader)
+            altitude_anterior = 0
+            time_anterior = 0
+            for row in reader:
+                time = int(row['Time'])
+                status = int(row['Status'])
+                pressure = float(row['Pressure'])
+                temperature = float(row['Temperature'])
+                bmp_altitude = float(row['BMP Altitude'])
+                max_altitude = float(row['Max Altitude'])
+                accel_x = float(row['Accel_X'])
+                accel_y = float(row['Accel_Y'])
+                accel_z = float(row['Accel_Z'])
+                rotation_x = float(row['Rotation_X'])
+                rotation_y = float(row['Rotation_Y'])
+                rotation_z = float(row['Rotation_Z'])
+                latitude = float(row['Latitude'])
+                longitude = float(row['Longitude'])
+                gps_altitude = float(row['GPS Altitude'])
+                voltage = float(row['Voltage'])
+                q1, q2, q3, q4 = euler_to_quaternion(rotation_x, rotation_y, rotation_z)
+                accel = calcular_accel(accel_x, accel_y, accel_z)
+                altitude = calcular_altitude(gps_altitude, bmp_altitude)
+                vel_vertical = calcular_vel_vertical(altitude, altitude_anterior, time, time_anterior)
+                apogeu = max_altitude
+                fix = 0
+                accel_int = max(min(int(accel * 10), MAX_ACCEL),0)
+                voltage_int = int(voltage * 10)
+                info = struct.pack(FORMAT,
+                                time,
+                                latitude,
+                                longitude,
+                                int(altitude * 10),
+                                int(apogeu * 10),
+                                int(vel_vertical * 10),
+                                q1,
+                                q2,
+                                q3,
+                                q4,
+                                accel_int,
+                                status,
+                                voltage_int,
+                                fix)
+                port.write(info)
+                altitude_anterior = altitude
+                time_anterior = time
+                print(time)
+                time_module.sleep(0.05)
+        except KeyboardInterrupt:
+            print('INTERROMPENDO O SIMULADOR')
+            port.close()
+            sys.exit(0)
+        finally:
+            port.close()
