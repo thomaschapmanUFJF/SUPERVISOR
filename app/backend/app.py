@@ -23,6 +23,6 @@ async def websocket_endpoint(websocket: WebSocket):
             current_row = last_row_instance.get_row()
             if current_row is not None:
                 await websocket.send_json(asdict(current_row))
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.05)
     except Exception as e:
         print(f'ERROR: {e.getmessage}')
