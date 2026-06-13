@@ -1,7 +1,7 @@
 import { useTelemetria } from './Telemetria';
 import { useShallow } from 'zustand/react/shallow';
 
-export default function GraficoTeste() {
+export default function GraficoBarras() {
   const altitudeAtual = useTelemetria((state) => state.atual?.altitude || 0);
   const historicoAltitude = useTelemetria((state) => state.historicoAltitude, useShallow);
 
