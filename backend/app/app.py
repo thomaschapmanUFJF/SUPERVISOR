@@ -1,6 +1,6 @@
 import asyncio
 
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import fastapi.middleware.cors as cors
 from dataclasses import asdict
 from app.last_row import last_row_instance
@@ -24,5 +24,7 @@ async def websocket_endpoint(websocket: WebSocket):
             if current_row is not None:
                 await websocket.send_json(asdict(current_row))
             await asyncio.sleep(0.05)
+    except WebSocketDisconnect:
+        print('DESCONECTADO MANUALMENTE')
     except Exception as e:
-        print(f'ERROR: {e.getmessage}')
+        print(f'ERRO: {str(e)}')
