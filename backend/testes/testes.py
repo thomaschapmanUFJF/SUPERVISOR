@@ -98,6 +98,7 @@ def through_csv():
                                 fix)
                 altitude_anterior = altitude
                 time_anterior = time 
+                time_module.sleep(0.05)
                 yield info
 if __name__ == '__main__':
     with open(CSV_PATH, 'r') as file:
