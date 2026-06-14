@@ -1,6 +1,6 @@
 import serial
 import struct
-from backend.testes.testes import through_csv
+from testes.testes import through_csv
 from config.config import CONFIG
 from app.schema import FORMAT
 
