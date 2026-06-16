@@ -5,17 +5,16 @@ import sys
 import math
 import time as time_module
 from config.config import CONFIG
+from config.serial import SERIAL_CONFIG
 from app.schema import FORMAT
 
 # SERIAL SETTINGS
-BAUDRATE = CONFIG['SERIAL']['BAUDRATE']
-WRITE_PORT_PATH = CONFIG['SERIAL']['WRITE_PORT']['PATH']
+BAUDRATE = SERIAL_CONFIG['BAUDRATE']
+WRITE_PORT_PATH = SERIAL_CONFIG['WRITE_PORT']['PATH']
 
 # MISC SETTINGS
 CSV_PATH = CONFIG['TEST']['CSV_PATH']
 MAX_ACCEL = CONFIG['TEST']['MAX_ACCEL']
-
-# 
 
 def euler_to_quaternion(rotation_x, rotation_y, rotation_z):
     rotation_x = rotation_x * 3.141592653589793 / 180

@@ -14,7 +14,7 @@ start http://localhost:5173
 timeout /t 3 /nobreak
 echo [2] Iniciando o Backend e Motor de Leitura (main.py)...
 :: O main.py e o "cerebro" que liga o motor e o servidor web ao mesmo tempo
-start "ESTACAO SOLO - Backend" cmd /k "cd backend && python main.py 1"
+start "ESTACAO SOLO - Backend" cmd /k "cd backend && py main.py 1"
 
 echo ==============================================
 echo Tudo pronto! Esta janela fechara em 5 segundos.
