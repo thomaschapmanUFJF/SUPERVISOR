@@ -1,4 +1,3 @@
-
 import struct
 from testes.testes import through_csv
 from app.schema import FORMAT
@@ -11,8 +10,8 @@ class Mensageiro:
         self.through_csv = through_csv()
         if (test):
             import serial
-            from backend.config.serial import SERIAL_CONFIG
-            BAUDRATE = SERIAL_CONFIG['SERIAL']['BAUDRATE']
+            from config.serial import SERIAL_CONFIG
+            BAUDRATE = SERIAL_CONFIG['BAUDRATE']
             READ_PORT_PATH = SERIAL_CONFIG['READ_PORT']['PATH']
             self.port = serial.Serial(port=READ_PORT_PATH, baudrate=BAUDRATE, timeout=1)
 
