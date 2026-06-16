@@ -5,11 +5,11 @@ import sys
 import math
 import time as time_module
 from config.config import CONFIG
-from backend.config.serial import SERIAL_CONFIG
+from config.serial import SERIAL_CONFIG
 from app.schema import FORMAT
 
 # SERIAL SETTINGS
-BAUDRATE = SERIAL_CONFIG['SERIAL']['BAUDRATE']
+BAUDRATE = SERIAL_CONFIG['BAUDRATE']
 WRITE_PORT_PATH = SERIAL_CONFIG['WRITE_PORT']['PATH']
 
 # MISC SETTINGS
