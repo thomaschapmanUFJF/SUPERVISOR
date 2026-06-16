@@ -20,7 +20,7 @@ class Mensageiro:
             data = self.port.read(self.size)
             if len(data) != self.size:
                 raise TimeoutError(f"TIMEOUT NA PORTA. Esperava {self.size} bytes, recebeu {len(data)}")
-        return data
+            return data
     
     def get_row(self):
         return next(self.through_csv) if self.test is True else self.through_virtual_port()
