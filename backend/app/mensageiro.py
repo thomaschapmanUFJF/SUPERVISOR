@@ -8,7 +8,7 @@ class Mensageiro:
         self.format = FORMAT
         self.size = struct.calcsize(self.format)
         self.through_csv = through_csv()
-        if (test):
+        if (not test):
             import serial
             from config.serial import SERIAL_CONFIG
             BAUDRATE = SERIAL_CONFIG['BAUDRATE']
@@ -16,7 +16,7 @@ class Mensageiro:
             self.port = serial.Serial(port=READ_PORT_PATH, baudrate=BAUDRATE, timeout=1)
 
     def through_virtual_port(self):
-        if (self.test):
+        if (not self.test):
             data = self.port.read(self.size)
             if len(data) != self.size:
                 raise TimeoutError(f"TIMEOUT NA PORTA. Esperava {self.size} bytes, recebeu {len(data)}")
