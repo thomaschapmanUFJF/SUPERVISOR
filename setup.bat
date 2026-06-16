@@ -61,7 +61,7 @@ echo Diretorio atual: %cd%
 if exist "node_modules" (
     rmdir /s /q "node_modules"
 )
-if exist "package-lock.json"(
+if exist "package-lock.json" (
     del "package-lock.json"
 )
 
@@ -83,5 +83,15 @@ echo               SETUP COMPLETO!
 echo ==============================================
 timeout /t 5 /nobreak
 
-REM CRITICAL: Use exit /b to return to parent script without closing CMD
+REM ==============================================
+REM Function to check if pip package is installed
+REM ==============================================
+:check_pip_package
+set PACKAGE_INSTALLED=1
+pip show %1 >nul 2>&1
+if %errorlevel% equ 0 (
+    set PACKAGE_INSTALLED=0
+) else (
+    set PACKAGE_INSTALLED=1
+)
 exit /b 0
