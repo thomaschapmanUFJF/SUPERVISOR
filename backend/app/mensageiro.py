@@ -1,7 +1,6 @@
-import serial
+
 import struct
 from testes.testes import through_csv
-from config.config import CONFIG
 from app.schema import FORMAT
 
 class Mensageiro:
@@ -11,8 +10,10 @@ class Mensageiro:
         self.size = struct.calcsize(self.format)
         self.through_csv = through_csv()
         if (test):
-            BAUDRATE = CONFIG['SERIAL']['BAUDRATE']
-            READ_PORT_PATH = CONFIG['SERIAL']['READ_PORT']['PATH']
+            import serial
+            from backend.config.serial import SERIAL_CONFIG
+            BAUDRATE = SERIAL_CONFIG['SERIAL']['BAUDRATE']
+            READ_PORT_PATH = SERIAL_CONFIG['READ_PORT']['PATH']
             self.port = serial.Serial(port=READ_PORT_PATH, baudrate=BAUDRATE, timeout=1)
 
     def through_virtual_port(self):
@@ -23,4 +24,4 @@ class Mensageiro:
             return data
     
     def get_row(self):
-        return next(self.through_csv) if self.test is True else self.through_virtual_port()
+        return next(self.through_csv) if self.test else self.through_virtual_port()
