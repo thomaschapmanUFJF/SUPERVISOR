@@ -5,8 +5,6 @@ class last_row():
         self.last_row = row
     def get_row(self):
         return self.last_row
-    def set_recebendo_dados(self, booleano):
-        self.recebendo_dados = booleano
 
 global last_row_instance 
 last_row_instance = last_row()
