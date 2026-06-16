@@ -16,21 +16,31 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-REM Install Python packages
-pip install fastapi[standard]
-if %errorlevel% neq 0 (
-    echo ERRO: instalacao do pip falhou!
-    pause
-    exit /b 1
+REM Function to check if a pip package is installed
+call :check_pip_package fastapi
+if !PACKAGE_INSTALLED! equ 0 (
+    echo FastAPI ja esta instalado. Pulando...
+) else (
+    echo Instalando FastAPI...
+    pip install fastapi[standard]
+    if %errorlevel% neq 0 (
+        echo ERRO: instalacao do fastapi falhou!
+        pause
+        exit /b 1
+    )
 )
 
-REM Install Pyserial
-pip install pyserial
-
-if %errorlevel% neq 0 (
-    echo ERRO: instalacao do pyserial
-    pause
-    exit /b 1
+call :check_pip_package pyserial
+if !PACKAGE_INSTALLED! equ 0 (
+    echo PySerial ja esta instalado. Pulando...
+) else (
+    echo Instalando PySerial...
+    pip install pyserial
+    if %errorlevel% neq 0 (
+        echo ERRO: instalacao do pyserial falhou!
+        pause
+        exit /b 1
+    )
 )
 
 echo.
@@ -47,6 +57,13 @@ if not exist "frontend" (
 REM Push to frontend and install
 pushd frontend
 echo Diretorio atual: %cd%
+
+if exist "node_modules" (
+    rmdir /s /q "node_modules"
+)
+if exist "package-lock.json"(
+    del "package-lock.json"
+)
 
 npm install
 set NPM_ERROR=!errorlevel!
