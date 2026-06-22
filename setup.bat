@@ -43,6 +43,19 @@ if !PACKAGE_INSTALLED! equ 0 (
     )
 )
 
+call :check_pip_package crc
+if !PACKAGE_INSTALLED! equ 0 (
+    echo CRC ja esta instalado. Pulando...
+) else (
+    echo Instalando CRC...
+    pip install crc
+    if %errorlevel% neq 0 (
+        echo ERRO: instalacao do crc falhou!
+        pause
+        exit /b 1
+    )
+)
+
 echo.
 
 echo [2] Instalando dependencias do React...
