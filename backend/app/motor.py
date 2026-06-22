@@ -1,12 +1,12 @@
 import csv
 from dataclasses import asdict
 import struct
-
-from app.mensageiro import Mensageiro
-from app.last_row import last_row_instance
+import traceback
+from app.Mensageiro import Mensageiro
+from app.Singleton import last_row
 from config.config import CONFIG
 from app.schema import HEADER
-from app.schema import FORMAT
+from app.schema import PAYLOAD_FORMAT
 from app.Row import Row
 
 FILENAME = CONFIG['CSV']['FILENAME']
@@ -20,36 +20,42 @@ def update_csv(row):
         writer = csv.DictWriter(csvfile, fieldnames=HEADER)
         writer.writerow(asdict(row))
 def decode_row(data):
-    decoded = struct.unpack(FORMAT, data)        
+    decoded = struct.unpack(PAYLOAD_FORMAT, data)        
     return Row(*decoded)
 
 def motor(test):
     print('INICIANDO...')
     mensageiro = Mensageiro(test)
     tentativas = 0
-    rows_recebidas = 0
+    fails = 0
+    received_rows = 0
     write_header()
+    print("RECEIVED ROWS:")
     while True:
         try:
-            data = mensageiro.get_row()
+            data = mensageiro.get_package()
+            if (data is None):
+                fails += 1
+                continue
             row = decode_row(data)
-            last_row_instance.update_row(row)
+            last_row.update(row)
             update_csv(row)
-            rows_recebidas += 1
+            received_rows += 1
 
-            if rows_recebidas % 10 == 0:
-                print(f"ROWS RECEBIDAS: {rows_recebidas}")
+            if received_rows % 10 == 0:
+                print(f"    {received_rows}")
 
         except TimeoutError:
             print('ESPERANDO DADOS DO FOGUETE...')
             tentativas += 1
             if tentativas >= 10:
                 print('NENHUM DADO RECEBIDO APÓS 10 TENTATIVAS. ENCERRANDO...')
-                last_row_instance.update_row(None)
+                last_row.update(None)
                 break
         except KeyboardInterrupt:
             print('TECLADO APERTADO. ENCERRANDO...')
             break
-        except Exception as e:
-            print(f'ERRO INESPERADO: {e}')
-            break
+        except Exception:
+            print(f'ERRO INESPERADO EM MOTOR:')
+            traceback.print_exc()
+            break       
