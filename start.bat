@@ -20,7 +20,7 @@ timeout /t 2 /nobreak > NUL
 
 echo [4] Iniciando o Foguete Simulado (testes.py)...
 :: Rodando como modulo para garantir que os imports da pasta config funcionem
-start "SIMULADOR - Foguete" cmd /k "cd backend && python -m testes.testes"
+start "SIMULADOR - Foguete" cmd /k "cd backend && python -m testes.test"
 
 echo ==============================================
 echo Tudo pronto! Esta janela fechara em 5 segundos.
