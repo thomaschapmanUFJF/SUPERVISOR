@@ -1,11 +1,12 @@
 import asyncio
-
+import traceback
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 import fastapi.middleware.cors as cors
 from dataclasses import asdict
-from app.last_row import last_row_instance
+from app.Singleton import last_row, last_error
 
-current_row = last_row_instance.get_row()
+current_row = last_row.get()
+current_error = last_error.get()
 app = FastAPI()
 app.add_middleware(
     cors.CORSMiddleware,
@@ -20,11 +21,12 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         await websocket.accept() 
         while True:
-            current_row = last_row_instance.get_row()
+            current_row = last_row.get()
             if current_row is not None:
                 await websocket.send_json(asdict(current_row))
             await asyncio.sleep(0.05)
     except WebSocketDisconnect:
         print('DESCONECTADO MANUALMENTE')
-    except Exception as e:
-        print(f'ERRO: {str(e)}')
+    except Exception:
+        print(f'ERRO INESPERADO EM APP:')
+        traceback.print_exc()
