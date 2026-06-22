@@ -1,11 +1,12 @@
+from crc import Crc16
+
 CONFIG = {
-    'TEST':
-    {
-        'CSV_PATH':'data/FLIGHT2.csv',
-        'MAX_ACCEL': 255
-    },
     'CSV':
     {
         'FILENAME': 'data/FLIGHT3.csv',
     },
+    'CRC':
+    {
+        'TYPE': Crc16.IBM
+    }
 }
