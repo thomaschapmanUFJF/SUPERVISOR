@@ -2,7 +2,7 @@ import csv
 from dataclasses import asdict
 import struct
 import traceback
-from app.Mensageiro import Mensageiro
+from backend.app.Mensageiro import Mensageiro
 from app.Singleton import last_row
 from config.config import CONFIG
 from app.schema import HEADER
