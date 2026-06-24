@@ -1,47 +1,62 @@
 import struct
+from config.config import CONFIG
+import json
 
-PACKET_FIELDS = [
-            ('time', 'I'),
-            ('latitude', 'f'),
-            ('longitude', 'f'),
-            ('altitude', 'H'),
-            ('apogeu', 'H'),
-            ('vel_vertical', 'h'),
-            ('q1', 'f'),
-            ('q2', 'f'),
-            ('q3', 'f'),
-            ('q4', 'f'),
-            ('accel_int', 'B'),
-            ('status', 'B'),
-            ('voltage_int', 'B'),
-            ('fix', 'B')
-        ]
+JSON_PATH = CONFIG['json']['path']
 
-HEADER = [field[0] for field in PACKET_FIELDS]
+def open_json():
+    with open(JSON_PATH, 'r') as f:
+        return json.load(f)
+        
+JSON_SCHEMA = open_json()
 
-HEADER_SIZE = 4
+LOGICAL_TYPE_INFO = {
+    'uint8':   {'struct': 'B', 'python': int},
+    'int8':    {'struct': 'b', 'python': int},
+    'uint16':  {'struct': 'H', 'python': int},
+    'int16':   {'struct': 'h', 'python': int},
+    'uint32':  {'struct': 'I', 'python': int},
+    'int32':   {'struct': 'i', 'python': int},
+    'float32': {'struct': 'f', 'python': float},
+}
 
-PAYLOAD_FORMAT = '<' + ''.join(tipo for _, tipo in PACKET_FIELDS)
+def json_to_python():
+    return {k:LOGICAL_TYPE_INFO[v]['python'] for k,v in JSON_SCHEMA.items()}
+
+def json_to_format_string():
+    string = '<'
+    for tipo in open_json().values():
+        string.join(LOGICAL_TYPE_INFO[tipo]['struct'])
+    return string
+
+HEADER = {
+    'sync1': {'idx': 0, 'size': 1, 'value': 0xAA},
+    'sync2': {'idx': 1, 'size': 1, 'value': 0xFF},
+    'type': {'idx': 2, 'size': 1},
+    'length': {'idx': 3, 'size': 1},    
+}
+
+HEADER['size'] = sum(item['size'] for item in HEADER.values())
+
+PAYLOAD_FIELDS = JSON_SCHEMA.keys()
+PAYLOAD_FORMAT = json_to_format_string()
 PAYLOAD_SIZE = struct.calcsize(PAYLOAD_FORMAT)
 
+PAYLOAD = {
+    'idx': 4,
+    'size': PAYLOAD_SIZE,
+    'format': PAYLOAD_FORMAT,
+    'fields': PAYLOAD_FIELDS
+}
+
 FRAME_SCHEMA = {
-    'header': {
-        'sync1': {'idx': 0, 'size': 1, 'value': 0xAA},
-        'sync2': {'idx': 1, 'size': 1, 'value': 0xFF},
-        'type': {'idx': 2, 'size': 1},
-        'length': {'idx': 3, 'size': 1},
-    },
-    'payload': {
-        'idx': 4,
-        'size': PAYLOAD_SIZE,
-        'format': PAYLOAD_FORMAT,
-        'fields': PACKET_FIELDS
-    },
+    'header': HEADER,
+    'payload': PAYLOAD,
     'crc': {
-        'idx': HEADER_SIZE + PAYLOAD_SIZE,
+        'idx': HEADER['size'] + PAYLOAD_SIZE,
         'size': 2,
         'endianness': 'little'
     }
 }
 SYNC_SIZE = FRAME_SCHEMA['header']['sync1']['size'] + FRAME_SCHEMA['header']['sync2']['size']
-FRAME_SIZE = HEADER_SIZE + PAYLOAD_SIZE + 2  
+FRAME_SCHEMA['size'] = FRAME_SCHEMA['header']['size'] + FRAME_SCHEMA['payload']['size'] + 2  
