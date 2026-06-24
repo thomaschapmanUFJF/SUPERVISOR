@@ -5,19 +5,19 @@ import traceback
 from app.Mensageiro import Mensageiro
 from app.Singleton import last_row
 from config.config import CONFIG
-from app.schema import HEADER
+from app.schema import PAYLOAD_FIELDS
 from app.schema import PAYLOAD_FORMAT
 from app.Row import Row
 
-FILENAME = CONFIG['CSV']['FILENAME']
+FILENAME = CONFIG['csv']['filename']
 
 def write_header():
     with open(FILENAME,'w',newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=HEADER)
+        writer = csv.DictWriter(csvfile, fieldnames=PAYLOAD_FIELDS)
         writer.writeheader()
 def update_csv(row):
     with open(FILENAME, 'a', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=HEADER)
+        writer = csv.DictWriter(csvfile, fieldnames=PAYLOAD_FIELDS)
         writer.writerow(asdict(row))
 def decode_row(data):
     decoded = struct.unpack(PAYLOAD_FORMAT, data)        
