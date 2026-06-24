@@ -1,0 +1,16 @@
+{
+  "time": "uint32",
+  "latitude": "float32",
+  "longitude": "float32",
+  "altitude": "uint16",
+  "apogeu": "uint16",
+  "vel_vertical": "int16",
+  "qw": "float32",
+  "qx": "float32",
+  "qy": "float32",
+  "qz": "float32",
+  "accel_int": "uint8",
+  "status": "uint8",
+  "voltage_int": "uint8",
+  "fix": "uint8"
+}
