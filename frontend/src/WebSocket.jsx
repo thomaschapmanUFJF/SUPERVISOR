@@ -16,8 +16,8 @@ const websocket = new WebSocket('ws://localhost:8000/ws');
       console.log('WebSocket connection closed');
     };
 
-    websocket.onerror = (error) => {
-      console.error('WebSocket error:', error);
+    websocket.onerror = (event) => {
+      console.error('WebSocket error:', event);
         console.log('  - Code:', event.code);
         console.log('  - Reason:', event.reason);
         console.log('  - Was clean:', event.wasClean);
