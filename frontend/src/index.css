@@ -21,7 +21,7 @@
   --err-glow:    rgba(255,34,34,0.4);
   --txt-pri:     #f0f0f0;
   --txt-sec:     #666;
-  --txt-dim:     #333;
+  --txt-dim:     #535353;
   --font-mono:   'Space Mono', monospace;
 }
 
@@ -293,12 +293,10 @@ body::before {
 
 /* ── CHART BUTTON GROUP ── */
 .chart-button-group {
-  position: absolute;
-  top: 12px;
-  left: 12px;
   display: flex;
   gap: 6px;
-  z-index: 10;
+  justify-content: center;
+  margin-top: 4px;         
 }
 
 .btn-chart {
