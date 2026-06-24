@@ -1,18 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import make_dataclass
+from config.config import CONFIG
+from app.schema import json_to_python
 
-@dataclass
-class Row:
-    time: int
-    latitude: float
-    longitude: float
-    altitude: float
-    apogeu: float
-    vel_vertical: float
-    q1: float
-    q2: float
-    q3: float
-    q4: float
-    accel_int: int
-    status: int
-    voltage_int: int
-    fix: int
+JSON_PATH = CONFIG['json']['path']
+
+Row = make_dataclass('Row', list(json_to_python().items()))
