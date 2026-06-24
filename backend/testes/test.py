@@ -9,10 +9,10 @@ from app.schema import PAYLOAD_FORMAT
 from config.serial import SERIAL_CONFIG
 from config.test import TEST_CONFIG
 
-BAUDRATE = SERIAL_CONFIG['BAUDRATE']
-WRITE_PORT_PATH = SERIAL_CONFIG['WRITE_PORT']['PATH']
-CSV_PATH = TEST_CONFIG['CSV_PATH']
-MAX_ACCEL = TEST_CONFIG['MAX_ACCEL']
+BAUDRATE = SERIAL_CONFIG['baudrate']
+WRITE_PORT_PATH = SERIAL_CONFIG['write_port']['path']
+CSV_PATH = TEST_CONFIG['csv']['path']
+MAX_ACCEL = TEST_CONFIG['max_accel']
 
 
 def euler_to_quaternion(rotation_x, rotation_y, rotation_z):
