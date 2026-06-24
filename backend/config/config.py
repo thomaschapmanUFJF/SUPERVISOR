@@ -1,12 +1,18 @@
 from crc import Crc16
+from pathlib import Path
 
+SCHEMA_PATH = Path(__file__).parent.parent.parent / 'schema.json'
 CONFIG = {
-    'CSV':
+    'csv':
     {
-        'FILENAME': 'data/FLIGHT3.csv',
+        'filename': 'data/FLIGHT3.csv',
     },
-    'CRC':
+    'json':
     {
-        'TYPE': Crc16.IBM
+        'path': SCHEMA_PATH
+    },
+    'crc':
+    {
+        'type': Crc16.IBM
     }
 }
