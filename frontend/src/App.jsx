@@ -5,7 +5,7 @@ import GraficoArea from './GraficoArea';
 import FogueteModelo from './FogueteModelo';
 import { useTelemetria } from './Telemetria';
 import { Suspense } from 'react';
-import { OrbitControls, Stage } from '@react-three/drei'; 
+import { OrbitControls, Stage, Grid} from '@react-three/drei'; 
 import Mapa from './Mapa';
 import L from 'leaflet'
 import iconUrl from 'leaflet/dist/images/marker-icon.png'
@@ -14,9 +14,10 @@ import './WebSocket';
 
 
 export default function App(){
-  L.Icon.Default.mergeOptions({ iconUrl, shadowUrl: iconShadow })
+  L.Icon.Default.mergeOptions({ iconUrl, shadowUrl: iconShadow });
   const time = useTelemetria((state) => state.atual?.time);
   const [chartType, setChartType] = useState('barras');
+  const canvasRef = useRef();
   return (
     <div className="app-root">
 
@@ -62,15 +63,27 @@ export default function App(){
         {/* ── MODELO 3D ── */}
         <section className="card card-3d">
           <div className="card-label">orientação · IMU</div>
-          <div className="canvas-wrap">
+          <div className="canvas-wrap" ref={canvasRef}>
           <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
             <Suspense fallback={null}>
               <Stage environment="city" intensity={0.5} contactShadow={false}>
-                <FogueteModelo />
+                <Grid 
+                  position={[0, -1, 0]}  
+                  args={[10, 10]}        
+                  cellSize={0.5}
+                  cellThickness={1}
+                  cellColor="#6f6f6f"
+                  sectionSize={1}
+                  sectionThickness={1.5}
+                  sectionColor="#9d9d9d"
+                  fadeDistance={10}
+                  fadeStrength={0.5}
+                  infiniteGrid={false}
+                />
+                  <FogueteModelo />
               </Stage>
             </Suspense>
-            
-            <OrbitControls makeDefault />
+            <OrbitControls makeDefault domElement={canvasRef.current}/>
           </Canvas>
           </div>
         </section>
