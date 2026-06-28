@@ -5,7 +5,7 @@ import sys
 import math
 import time as time_module
 from app.frame_utils import build_frame, add_noise
-from app.schema import PAYLOAD_FORMAT
+from app.schema import PAYLOAD_FORMAT, JSON_SCHEMA
 from config.serial import SERIAL_CONFIG
 from config.test import TEST_CONFIG
 
@@ -16,9 +16,9 @@ MAX_ACCEL = TEST_CONFIG['max_accel']
 
 
 def euler_to_quaternion(rotation_x, rotation_y, rotation_z):
-    rotation_x = rotation_x * 3.141592653589793 / 180
-    rotation_y = rotation_y * 3.141592653589793 / 180
-    rotation_z = rotation_z * 3.141592653589793 / 180
+    rotation_x = rotation_x * math.pi / 180
+    rotation_y = rotation_y * math.pi / 180
+    rotation_z = rotation_z * math.pi / 180
 
     cy = math.cos(rotation_z * 0.5)
     sy = math.sin(rotation_z * 0.5)
@@ -27,17 +27,18 @@ def euler_to_quaternion(rotation_x, rotation_y, rotation_z):
     cr = math.cos(rotation_x * 0.5)
     sr = math.sin(rotation_x * 0.5)
 
-    q1 = cy * cp * cr + sy * sp * sr
-    q2 = cy * cp * sr - sy * sp * cr
-    q3 = cy * sp * cr + sy * cp * sr
-    q4 = sy * cp * cr - cy * sp * sr
-    norm = math.sqrt(q1*q1 + q2*q2 + q3*q3 + q4*q4)
+    qw = cy * cp * cr + sy * sp * sr
+    qx = cy * cp * sr - sy * sp * cr
+    qy = cy * sp * cr + sy * cp * sr
+    qz = sy * cp * cr - cy * sp * sr
+    norm = math.sqrt(qw*qw + qx*qx + qy*qy + qz*qz)
     if norm > 0:
-        q1 /= norm
-        q2 /= norm
-        q3 /= norm
-        q4 /= norm
-    return q1, q2, q3, q4
+        qw /= norm
+        qx /= norm
+        qy /= norm
+        qz /= norm
+        
+    return qw, qx, qy, qz
 
 def total_acceleration(accel_x, accel_y, accel_z):
     return (accel_x**2 + accel_y**2 + accel_z**2)**0.5
@@ -70,30 +71,29 @@ def generate_packages():
             gps_altitude = float(row['GPS Altitude'])
             voltage = float(row['Voltage'])
             
-            q1, q2, q3, q4 = euler_to_quaternion(rotation_x, rotation_y, rotation_z)
+            qw, qx, qy, qz = euler_to_quaternion(rotation_x, rotation_y, rotation_z)
             accel = total_acceleration(accel_x, accel_y, accel_z)
             altitude = average_altitude(gps_altitude, bmp_altitude)
             vel_vertical = vertical_velocity(altitude, previous_altitude, time, previous_time)
             apogeu = max_altitude
             fix = 0
-            accel_int = max(min(int(accel * 10), MAX_ACCEL), 0)
-            voltage_int = int(voltage * 10)
-            
-            payload = struct.pack(PAYLOAD_FORMAT,
-                                time,
-                                latitude,
-                                longitude,
-                                int(altitude * 10),
-                                int(apogeu * 10),
-                                int(vel_vertical * 10),
-                                q1,
-                                q2,
-                                q3,
-                                q4,
-                                accel_int,
-                                status,
-                                voltage_int,
-                                fix)
+            valores = {
+                            'time':         time,
+                            'latitude':     latitude,
+                            'longitude':    longitude,
+                            'altitude':     int(altitude * 10),
+                            'apogeu':       int(apogeu * 10),
+                            'vel_vertical': int(vel_vertical * 10),
+                            'qw':           qw,
+                            'qx':           qx,
+                            'qy':           qy,
+                            'qz':           qz,
+                            'accel_int':    max(min(int(accel * 10), MAX_ACCEL), 0),
+                            'status':       int(row['Status']),
+                            'voltage_int':  int(float(row['Voltage']) * 10),
+                            'fix':          0,
+                        }            
+            payload = struct.pack(PAYLOAD_FORMAT, *[valores[k] for k in JSON_SCHEMA.keys()])
             
             previous_altitude = altitude
             previous_time = time
