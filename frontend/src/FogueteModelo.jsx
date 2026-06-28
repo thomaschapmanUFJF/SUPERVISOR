@@ -11,14 +11,13 @@ export default function FogueteModelo(){
     if (!foguete3D.current) return
     const pacote = useTelemetria.getState().atual
     if (!pacote) return
-    
-    if (pacote.q1 === 0 && pacote.q2 === 0 && pacote.q3 === 0 && pacote.q4 === 0) return
+    if (pacote.qx === 0 && pacote.qy === 0 && pacote.qz === 0 && pacote.qw === 0) return
 
     foguete3D.current.quaternion.set(
-      pacote.q2, // x
-      pacote.q3, // y
-      pacote.q4, // z
-      pacote.q1  // w
+      pacote.qw,
+      pacote.qx, 
+      pacote.qy, 
+      pacote.qz 
     )
   })
 

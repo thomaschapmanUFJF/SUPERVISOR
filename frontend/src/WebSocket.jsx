@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTelemetria } from './Telemetria';
 
 const websocket = new WebSocket('ws://localhost:8000/ws');
