@@ -53,7 +53,8 @@ class Mensageiro:
                     continue
 
                 length_byte = buffer[LENGTH['idx'] : LENGTH['idx'] + LENGTH['size']]
-                frame_size = HEADER['size'] + length_byte + CRC['size']
+                length_value = int.from_bytes(length_byte, byteorder='little')
+                frame_size = HEADER['size'] + length_value + CRC['size']
                 if len(buffer) < frame_size:
                     continue
                 

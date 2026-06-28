@@ -1,13 +1,13 @@
-class singleton():
+class Singleton():
     def __init__(self):
-        self.singleton_data = None
-    def update(self, data):
-        self.singleton_data = data
+        self.data = None
+    def set(self, data):
+        self.data = data
     def get(self):
-        return self.singleton_data
+        return self.data
 
 global last_row
 global last_error
 
-last_row = singleton()
-last_error = singleton()
+last_row = Singleton()
+last_error = Singleton()

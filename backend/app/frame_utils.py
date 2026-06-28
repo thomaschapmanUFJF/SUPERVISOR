@@ -5,7 +5,8 @@ from app.schema import PAYLOAD_FORMAT, FRAME_SCHEMA
 from config.test import TEST_CONFIG
 from config.config import CONFIG
 
-CRC = CONFIG['crc']
+CRC_TYPE = CONFIG['crc']['type']
+CRC = FRAME_SCHEMA['crc']
 
 PROBS = TEST_CONFIG['probs']
 SWAP = PROBS['swap']
@@ -18,7 +19,7 @@ SYNC_BYTE_1 = HEADER['sync1']['value']
 SYNC_BYTE_2 = HEADER['sync2']['value']
 
 def calculate_crc(type, length, payload):
-    calculator = Calculator(CRC['type'])
+    calculator = Calculator(CRC_TYPE)
     data = bytes([type]) + bytes([length]) + payload
     checksum = calculator.checksum(data)
     return checksum
@@ -27,8 +28,7 @@ def calculate_crc_from_frame(frame):
     type_byte = frame[HEADER['type']['idx']]
     length_byte = frame[HEADER['length']['idx']]
     payload = frame[HEADER['size'] : HEADER['size'] + length_byte]
-    
-    calculator = Calculator(CRC['type'])
+    calculator = Calculator(CRC_TYPE)
     data = bytes([type_byte]) + bytes([length_byte]) + payload
     crc_value = calculator.checksum(data)
     return crc_value

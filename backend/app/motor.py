@@ -3,11 +3,12 @@ from dataclasses import asdict
 import struct
 import traceback
 from app.Mensageiro import Mensageiro
-from app.Singleton import last_row
+from app.Singleton import last_row, last_error
 from config.config import CONFIG
 from app.schema import PAYLOAD_FIELDS
 from app.schema import PAYLOAD_FORMAT
 from app.Row import Row
+from app.Error import Error
 
 FILENAME = CONFIG['csv']['filename']
 
@@ -38,24 +39,24 @@ def motor(test):
                 fails += 1
                 continue
             row = decode_row(data)
-            last_row.update(row)
+            last_row.set(row)
             update_csv(row)
             received_rows += 1
 
             if received_rows % 10 == 0:
                 print(f"    {received_rows}")
 
-        except TimeoutError:
-            print('ESPERANDO DADOS DO FOGUETE...')
+        except TimeoutError as e:
+            last_error.set(e('ESPERANDO DADOS DO FOGUETE'))
             tentativas += 1
             if tentativas >= 10:
-                print('NENHUM DADO RECEBIDO APÓS 10 TENTATIVAS. ENCERRANDO...')
-                last_row.update(None)
+                last_error.set(e('NENHUM DADO RECEBIDO APÓS 10 TENTATIVAS. ENCERRANDO...'))
+                last_row.set(None)
                 break
-        except KeyboardInterrupt:
-            print('TECLADO APERTADO. ENCERRANDO...')
+        except KeyboardInterrupt as e:
+            last_error.set(e('TECLADO APERTADO. ENCERRANDO...'))
             break
-        except Exception:
-            print(f'ERRO INESPERADO EM MOTOR:')
+        except Exception as e:
+            last_error.set(e('ERRO INESPERADO EM MOTOR'))
             traceback.print_exc()
             break       

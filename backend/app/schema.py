@@ -26,7 +26,7 @@ def json_to_python():
 def json_to_format_string():
     string = '<'
     for tipo in open_json().values():
-        string.join(LOGICAL_TYPE_INFO[tipo]['struct'])
+        string += LOGICAL_TYPE_INFO[tipo]['struct']
     return string
 
 HEADER = {
