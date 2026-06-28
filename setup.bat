@@ -30,6 +30,19 @@ if !PACKAGE_INSTALLED! equ 0 (
     )
 )
 
+call :check_pip_package fastapiSSE
+if !PACKAGE_INSTALLED! equ 0 (
+    echo FastAPI ja esta instalado. Pulando...
+) else (
+    echo Instalando FastAPI SSE...
+    pip install fastapi[standard]
+    if %errorlevel% neq 0 (
+        echo ERRO: instalacao do fastapi falhou!
+        pause
+        exit /b 1
+    )
+)
+
 call :check_pip_package pyserial
 if !PACKAGE_INSTALLED! equ 0 (
     echo PySerial ja esta instalado. Pulando...
