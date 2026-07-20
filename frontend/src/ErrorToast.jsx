@@ -6,14 +6,22 @@ export default function ErroToast() {
     
     useEffect(() => {
         if (error) {
-            console.error('Error:', error.message);
+            const timer = setTimeout(() => {
+                useErrorState.getState().clearError();
+            }, 8000);
+            return () => clearTimeout(timer);
         }
     }, [error]);
     
     return error ? (
         <div className="error-toast">
-            ⚠️ {erro.message}
-            <button onClick={() => useErrorState.getState().clearError()}>✕</button>
+            <div className="error-toast-header">
+                <span className="error-toast-title">⚠️ Erro Detectado</span>
+                <button className="error-toast-close" onClick={() => useErrorState.getState().clearError()}>✕</button>
+            </div>
+            <div className="error-toast-message">
+                {error.message}
+            </div>
         </div>
     ) : null;
 }
