@@ -1,48 +1,47 @@
-import { useState, useRef} from 'react';
+import { useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
-import GraficoBarras from './GraficoBarras';
-import GraficoArea from './GraficoArea';
-import FogueteModelo from './FogueteModelo';
-import DebugTela from './DebugTela';
-import GraficoTela, { GraficoOption } from './GraficoTela';
-import ErroToast from './ErrorToast'
 import { useTelemetria } from './Telemetria';
 import { Suspense } from 'react';
-import { OrbitControls, Stage, Grid} from '@react-three/drei'; 
+import { Grid, Environment } from '@react-three/drei';
+import FogueteModelo from './FogueteModelo';
+import DebugTela from './DebugTela';
+import GraficoTela from './GraficoTela';
+import ErroToast from './ErrorToast'
 import Mapa from './Mapa';
 import L from 'leaflet';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import './WebSocket';
 import useErrorSSE from './EventSourceErrors';
+import TelaDadosIndisponiveis from './TelaDadosIndisponiveis';
 
-export default function App(){
-  L.Icon.Default.mergeOptions({ iconUrl, shadowUrl: iconShadow });
+function HeaderTime() {
   const time = useTelemetria((state) => state.atual?.time);
+  return <div className="header-time">{time ?? 'N/A'}</div>;
+}
+
+export default function App() {
+  L.Icon.Default.mergeOptions({ iconUrl, shadowUrl: iconShadow });
+  const isLive = useTelemetria((state) => state.isLive);
+  const hasData = useTelemetria((state) => state.hasData);
   const canvasRef = useRef();
-  const [activeTab, setActiveTab] = useState('debug');
-  const tabs = [
-    { id: 'debug', label: 'DEBUG', component: DebugTela },
-    { id: 'grafico', label: 'GRÁFICO', component: GraficoTela }
-  ];
-  const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
   useErrorSSE();
   return (
     <div className="app-root">
       {/* TOPO */}
-      <div className="top-strip">
+      <div className={`top-strip ${isLive ? 'online' : 'offline'}`}>
         <span className="top-strip-txt">SUPERNOVA · SUPERVISÓRIO DE VOO</span>
         <span className="top-strip-live">
-          <span className="live-sq" />
-          LIVE
+          {isLive && <span className="live-sq" />}
+          {isLive ? 'LIVE' : 'OFFLINE'}
         </span>
       </div>
-      <ErroToast/>
+      <ErroToast />
       {/* HEADER */}
       <div className="header">
         <div className="header-left">
           <div className="header-eyebrow">tempo de missão</div>
-          <div className="header-time">{time ?? 'N/A'}</div>
+          <HeaderTime />
           <div className="header-sub">Jiripoca v4.1 · LoRa 915 MHz</div>
         </div>
         <div className="header-right">
@@ -53,64 +52,66 @@ export default function App(){
 
       {/* CORPO PRINCIPAL */}
       <div className="main-grid">
-        <section className="card card-chart">
-          {/* Tab buttons */}
-          <div className="chart-button-group">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                className={`btn-chart ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-          
-          {/* Render active component */}
-          {ActiveComponent && <ActiveComponent />}
-        </section>
+        {/* COLUNA ESQUERDA: MAPA */}
+        <div className="col-left">
+          <section className="card card-mapa">
+            <div className="card-label">rastreamento · GPS</div>
+            <div className="mapa-wrap">
+              <Mapa />
+            </div>
+          </section>
+        </div>
 
-        {/* MODELO 3D */}
-        <section className="card card-3d">
-          <div className="card-label">orientação · IMU</div>
-          <div className="canvas-wrap" ref={canvasRef}>
-            <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
-              <Suspense fallback={null}>
-                <Stage environment="city" intensity={0.5} contactShadow={false}>
-                  <Grid 
-                    position={[0, -1, 0]}  
-                    args={[10, 10]}        
-                    cellSize={0.5}
-                    cellThickness={1}
-                    cellColor="#6f6f6f"
-                    sectionSize={1}
-                    sectionThickness={1.5}
-                    sectionColor="#9d9d9d"
-                    fadeDistance={10}
-                    fadeStrength={0.5}
-                    infiniteGrid={false}
-                  />
-                  <FogueteModelo />
-                </Stage>
-              </Suspense>
-              <OrbitControls makeDefault />
-            </Canvas>
+        {/* COLUNA MEIO: TELEMETRIA / DEBUG */}
+        <div className="col-middle">
+          <div className="card-debug-wrapper">
+            <DebugTela />
           </div>
-        </section>
+        </div>
 
-        {/* MAPA */}
-        <section className="card card-mapa">
-          <div className="card-label">rastreamento · GPS</div>
-          <div className="mapa-wrap">
-            <Mapa />
-          </div>
-        </section>
-      </div> 
+        {/* COLUNA DIREITA: FOGUETE 3D E GRÁFICOS */}
+        <div className="col-right">
+          {/* MODELO 3D */}
+          <section className="card card-3d">
+            <div className="card-label">orientação · IMU</div>
+            <div className="canvas-wrap" ref={canvasRef} style={{ flex: 1, minHeight: 0 }}>
+              {!hasData ? (
+                <TelaDadosIndisponiveis />
+              ) : (
+                <Canvas camera={{ position: [0, 0, 10], fov: 50 }} style={{ height: '100%', width: '100%' }}>
+                  <Suspense fallback={null}>
+                    <Environment preset="city" />
+                    <ambientLight intensity={0.4} />
+                    <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
+                    <directionalLight position={[-5, 5, -5]} intensity={0.4} />
+                    <FogueteModelo />
+                    <Grid
+                      position={[0, -1.5, 0]}
+                      args={[10, 10]}
+                      cellSize={0.5}
+                      cellThickness={1}
+                      cellColor="#6f6f6f"
+                      sectionSize={1}
+                      sectionThickness={1.5}
+                      sectionColor="#9d9d9d"
+                      fadeDistance={10}
+                      fadeStrength={0.5}
+                      infiniteGrid={false}
+                    />
+                  </Suspense>
+                </Canvas>
+              )}
+            </div>
+          </section>
+
+          {/* GRÁFICOS */}
+          <GraficoTela />
+        </div>
+      </div>
 
       {/* RODAPÉ */}
       <div className="bot-strip">
-        <span className="bs-item">STATUS <span className="bs-val">NOMINAL</span></span>
+        <span className="bs-item">STATUS <span className="bs-val">{isLive ? 'NOMINAL' : 'OFFLINE'}</span></span>
         <span className="bs-item">SUPERVISÓRIO <span className="bs-val">SUPERNOVA</span></span>
       </div>
     </div>
