@@ -1,9 +1,9 @@
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useTelemetria } from './Telemetria';
-import { useGLTF, Center } from '@react-three/drei'; 
+import { useGLTF, Center } from '@react-three/drei';
 
-export default function FogueteModelo(){
+export default function FogueteModelo() {
   const foguete3D = useRef();
   const { scene } = useGLTF('/rocket.glb');
 
@@ -14,20 +14,22 @@ export default function FogueteModelo(){
     if (pacote.qx === 0 && pacote.qy === 0 && pacote.qz === 0 && pacote.qw === 0) return
 
     foguete3D.current.quaternion.set(
-      pacote.qw,
-      pacote.qx, 
-      pacote.qy, 
-      pacote.qz 
+      pacote.qx,
+      pacote.qy,
+      pacote.qz,
+      pacote.qw
     )
   })
 
   return (
     <group ref={foguete3D}>
-      <Center> 
-        <primitive 
-          object={scene} 
-          scale={1} 
-        />
+      <Center>
+        <group rotation={[0, 0, -Math.PI / 2]}>
+          <primitive
+            object={scene}
+            scale={1}
+          />
+        </group>
       </Center>
     </group>
   );
