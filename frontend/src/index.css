@@ -259,18 +259,51 @@ body::before {
 .main-grid {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 320px;
+  grid-template-columns: 300px 1fr 320px;
+  grid-template-rows: 1fr;
   border-bottom: 1px solid var(--border);
+  min-height: 0;
 }
+
+.col-left, .col-middle, .col-right {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.col-left, .col-middle {
+  border-right: 1px solid var(--border);
+}
+
+.col-left .card-mapa {
+  height: 300px;
+  flex-shrink: 0;
+}
+
+.col-right .card-3d {
+  flex: 1;
+  min-height: 250px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+/* chart card in col-right is replaced by grafico-tela-wrap - keep sizing */
+.col-right .grafico-tela-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  min-height: 220px;
+  overflow: hidden;
+}
+
 
 /* ── CARDS ── */
 .card {
   padding: 20px 24px;
-  border-right: 1px solid var(--border);
-}
-
-.card:last-child {
-  border-right: none;
 }
 
 .card-label {
@@ -280,15 +313,64 @@ body::before {
   text-transform: uppercase;
   color: var(--txt-dim);
   margin-bottom: 14px;
+  flex-shrink: 0;
 }
 
-.card-text {
-  font-size: 8px;
-  letter-spacing: 4px;
+/* middle column: debug panel fills entire height */
+.col-middle {
+  flex: 1;
+}
+.col-middle .card-debug-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px;
+  min-height: 0;
+}
+.col-middle .debug-panel {
+  min-height: 0;
+}
+
+/* ── DADOS INDISPONIVEIS ── */
+.dados-indisponiveis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 150px;
+  color: var(--txt-sec);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  align-self: center;
-  color: var(--txt-pri);
-  margin-bottom: 14px;
+}
+.loading-dots {
+  animation: pulse-dots 1.5s infinite ease-in-out;
+}
+@keyframes pulse-dots {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ── OFFLINE STATUS ── */
+.top-strip.offline {
+  background: #111 !important;
+  border-bottom: 1px solid var(--border);
+}
+.top-strip.offline .top-strip-txt,
+.top-strip.offline .top-strip-live {
+  color: var(--txt-dim) !important;
+}
+
+.debug-header.offline {
+  border-bottom-color: rgba(128, 128, 128, 0.15) !important;
+}
+.debug-header.offline .debug-title {
+  color: var(--txt-sec) !important;
+  text-shadow: none !important;
+}
+.debug-header.offline .debug-status {
+  color: var(--txt-sec) !important;
 }
 
 /* ── DEBUG PANEL ── */
@@ -297,13 +379,60 @@ body::before {
   border-radius: 8px;
   padding: 16px 20px;
   border: 1px solid rgba(0, 255, 65, 0.2);
-  box-shadow: 
-    0 0 20px rgba(0, 255, 65, 0.05),
-    inset 0 0 20px rgba(0, 255, 65, 0.03);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.08);
+  animation: glow-border 3s ease-in-out infinite;
   font-family: 'Courier New', monospace;
-  max-height: 300px;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
   position: relative;
+}
+
+@keyframes glow-border {
+  0%, 100% { border-color: rgba(0, 255, 65, 0.2); }
+  50% { border-color: rgba(0, 255, 65, 0.5); }
+}
+
+.debug-panel.offline {
+  border-color: rgba(128, 128, 128, 0.15) !important;
+  box-shadow: 0 0 20px rgba(128, 128, 128, 0.05) !important;
+  animation: glow-border-offline 3s ease-in-out infinite !important;
+}
+
+@keyframes glow-border-offline {
+  0%, 100% { 
+    border-color: rgba(128, 128, 128, 0.15);
+  }
+  50% { 
+    border-color: rgba(128, 128, 128, 0.3);
+  }
+}
+
+.debug-panel.offline .debug-title {
+  color: var(--txt-sec) !important;
+  text-shadow: none !important;
+}
+
+.debug-panel.offline .debug-status {
+  color: var(--txt-sec) !important;
+}
+
+.debug-panel.offline .debug-key {
+  color: var(--txt-dim) !important;
+}
+
+.debug-panel.offline .debug-value {
+  color: var(--txt-sec) !important;
+  text-shadow: none !important;
+}
+
+.debug-panel.offline .debug-timestamp {
+  color: var(--txt-dim) !important;
+  border-top-color: rgba(128, 128, 128, 0.05) !important;
+}
+
+.debug-panel.offline .debug-item {
+  border-bottom-color: rgba(128, 128, 128, 0.05) !important;
 }
 
 /* Scrollbar styling */
@@ -413,7 +542,7 @@ body::before {
 .debug-timestamp {
   color: rgba(0, 255, 65, 0.3);
   font-size: 9px;
-  margin-top: 10px;
+  margin-top: 16px;
   padding-top: 8px;
   border-top: 1px solid rgba(0, 255, 65, 0.05);
   text-align: right;
@@ -448,21 +577,7 @@ body::before {
   border-radius: 8px;
 }
 
-/* Glow border animation */
-.debug-panel {
-  animation: glow-border 3s ease-in-out infinite;
-}
-
-@keyframes glow-border {
-  0%, 100% { 
-    border-color: rgba(0, 255, 65, 0.2);
-    box-shadow: 0 0 20px rgba(0, 255, 65, 0.05);
-  }
-  50% { 
-    border-color: rgba(0, 255, 65, 0.4);
-    box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
-  }
-}
+/* (glow-border moved to .debug-panel definition above) */
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -495,14 +610,24 @@ body::before {
 }
 
 /* ── GRÁFICO ── */
-.card-chart {
+/* grafico-tela-wrap is the root div rendered by GraficoTela */
+.grafico-tela-wrap {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+
+.grafico-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 180px;
 }
 
 .grafico-wrap {
   display: flex;
   flex-direction: column;
+  flex: 1;
   gap: 8px;
   position: relative;
 }
@@ -589,14 +714,19 @@ body::before {
 .chart-outer {
   background: #000;
   padding: 12px;
+  height: 160px;
+  display: flex;
+  align-items: flex-end;
 }
 
 .bars {
   display: flex;
   align-items: flex-end;
   gap: 3px;
-  height: 120px;
+  width: 100%;
+  height: 100%;
 }
+
 
 .bar {
   flex: 1;

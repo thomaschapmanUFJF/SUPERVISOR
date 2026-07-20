@@ -11,10 +11,12 @@ export default function GraficoBarras() {
     0
   );
 
+  const altitudeAtualEmMetros = (altitudeAtual / 10).toFixed(1);
+
   return (
     <div className="grafico-wrap">
       <div className="grafico-kpi">
-        <span className="grafico-kpi-val">{altitudeAtual}</span>
+        <span className="grafico-kpi-val">{altitudeAtualEmMetros}</span>
         <span className="grafico-kpi-unit">m AGL</span>
       </div>
 
@@ -34,7 +36,7 @@ export default function GraficoBarras() {
                   key={i}
                   className={`bar${isPeak ? ' peak' : isHi ? ' hi' : ''}`}
                   style={{ height: `${h}%` }}
-                  title={`${p.time} · ${p.altitude} m`}
+                  title={`${p.time} · ${(p.altitude / 10).toFixed(1)} m`}
                 />
               );
             })
@@ -43,4 +45,4 @@ export default function GraficoBarras() {
       </div>
     </div>
   );
-}
+}
