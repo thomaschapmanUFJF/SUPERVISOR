@@ -1,15 +1,19 @@
 import { useMap } from 'react-leaflet';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export default function SeguirFoguete({ posicao }) {
   const map = useMap();
+  const lastUpdateRef = useRef(0);
 
-  if (!posicao) return null;
   useEffect(() => {
-    if (posicao) {
+    if (!posicao) return;
+    const now = Date.now();
+    if (lastUpdateRef.current === 0 || now - lastUpdateRef.current > 2000) {
       map.setView([posicao.latitude, posicao.longitude]);
+      lastUpdateRef.current = now;
     }
-  }, [posicao]);
+  }, [posicao, map]);
 
   return null;
 }
+
