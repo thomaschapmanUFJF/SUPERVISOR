@@ -1,7 +1,7 @@
 import { useMap } from 'react-leaflet';
 import { useEffect, useRef } from 'react';
 
-export default function SeguirFoguete({ posicao }) {
+export default function FollowRocket({ posicao }) {
   const map = useMap();
   const lastUpdateRef = useRef(0);
 
@@ -16,4 +16,3 @@ export default function SeguirFoguete({ posicao }) {
 
   return null;
 }
-

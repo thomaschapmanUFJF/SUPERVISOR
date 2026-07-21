@@ -1,5 +1,5 @@
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
-import { useTelemetria } from './Telemetria';
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { useRowStore } from '../stores/useRowStore';
 import { useShallow } from 'zustand/react/shallow';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -17,8 +17,8 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default function GraficoArea() {
-  const historicoAltitude = useTelemetria((state) => state.historicoAltitude, useShallow);
+export default function AreaChartComponent() {
+  const historicoAltitude = useRowStore((state) => state.historicoAltitude, useShallow);
 
   const historicoEmMetros = historicoAltitude.map(p => ({
     time: p.time,
@@ -26,7 +26,7 @@ export default function GraficoArea() {
   }));
 
   return (
-    <div style={{ width: '100%', height: '100%', flex: 1, minHeight: '180px', position: 'relative' }}>
+    <div className="area-chart-wrapper">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={historicoEmMetros} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
@@ -49,5 +49,5 @@ export default function GraficoArea() {
         </AreaChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }

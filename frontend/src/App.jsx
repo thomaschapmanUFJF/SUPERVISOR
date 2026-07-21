@@ -1,31 +1,35 @@
-import { useRef } from 'react';
+import { useRef, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { useTelemetria } from './Telemetria';
-import { Suspense } from 'react';
 import { Grid, Environment } from '@react-three/drei';
-import FogueteModelo from './FogueteModelo';
-import DebugTela from './DebugTela';
-import GraficoTela from './GraficoTela';
-import ErroToast from './ErrorToast'
-import Mapa from './Mapa';
 import L from 'leaflet';
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import './WebSocket';
-import useErrorSSE from './EventSourceErrors';
-import TelaDadosIndisponiveis from './TelaDadosIndisponiveis';
+
+import { useRowStore } from './stores/useRowStore';
+import RocketModel from './components/RocketModel';
+import DebugPanel from './components/DebugPanel';
+import ChartPanel from './components/ChartPanel';
+import FlightMap from './components/FlightMap';
+import DataUnavailable from './components/DataUnavailable';
+import useErrorSSE from './hooks/useErrorSSE';
+import useRowSSE from './hooks/useRowSSE';
+import useErrorToast from './hooks/useErrorToast';
 
 function HeaderTime() {
-  const time = useTelemetria((state) => state.atual?.time);
+  const time = useRowStore((state) => state.atual?.time);
   return <div className="header-time">{time ?? 'N/A'}</div>;
 }
 
 export default function App() {
   L.Icon.Default.mergeOptions({ iconUrl, shadowUrl: iconShadow });
-  const isLive = useTelemetria((state) => state.isLive);
-  const hasData = useTelemetria((state) => state.hasData);
+  const isLive = useRowStore((state) => state.isLive);
+  const hasData = useRowStore((state) => state.hasData);
   const canvasRef = useRef();
+
+  useRowSSE();
   useErrorSSE();
+  useErrorToast();
+
   return (
     <div className="app-root">
       {/* TOPO */}
@@ -36,7 +40,7 @@ export default function App() {
           {isLive ? 'LIVE' : 'OFFLINE'}
         </span>
       </div>
-      <ErroToast />
+
       {/* HEADER */}
       <div className="header">
         <div className="header-left">
@@ -57,7 +61,7 @@ export default function App() {
           <section className="card card-mapa">
             <div className="card-label">rastreamento · GPS</div>
             <div className="mapa-wrap">
-              <Mapa />
+              <FlightMap />
             </div>
           </section>
         </div>
@@ -65,7 +69,7 @@ export default function App() {
         {/* COLUNA MEIO: TELEMETRIA / DEBUG */}
         <div className="col-middle">
           <div className="card-debug-wrapper">
-            <DebugTela />
+            <DebugPanel />
           </div>
         </div>
 
@@ -76,7 +80,7 @@ export default function App() {
             <div className="card-label">orientação · IMU</div>
             <div className="canvas-wrap" ref={canvasRef} style={{ flex: 1, minHeight: 0 }}>
               {!hasData ? (
-                <TelaDadosIndisponiveis />
+                <DataUnavailable />
               ) : (
                 <Canvas camera={{ position: [0, 0, 10], fov: 50 }} style={{ height: '100%', width: '100%' }}>
                   <Suspense fallback={null}>
@@ -84,7 +88,7 @@ export default function App() {
                     <ambientLight intensity={0.4} />
                     <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
                     <directionalLight position={[-5, 5, -5]} intensity={0.4} />
-                    <FogueteModelo />
+                    <RocketModel />
                     <Grid
                       position={[0, -1.5, 0]}
                       args={[10, 10]}
@@ -105,7 +109,7 @@ export default function App() {
           </section>
 
           {/* GRÁFICOS */}
-          <GraficoTela />
+          <ChartPanel />
         </div>
       </div>
 
