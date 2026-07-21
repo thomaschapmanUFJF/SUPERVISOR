@@ -1,18 +1,16 @@
+import json
 from crc import Crc16
 from pathlib import Path
 
-SCHEMA_PATH = Path(__file__).parent.parent.parent / 'schema.json'
+_CONFIG_DIR = Path(__file__).parent
+_CONFIG_PATH = _CONFIG_DIR / "config.json"
+SCHEMA_PATH = _CONFIG_DIR.parent.parent / "schema.json"
+
+with open(_CONFIG_PATH, "r") as f:
+    _raw = json.load(f)
+
 CONFIG = {
-    'csv':
-    {
-        'filename': 'data/FLIGHT3.csv',
-    },
-    'json':
-    {
-        'path': SCHEMA_PATH
-    },
-    'crc':
-    {
-        'type': Crc16.IBM
-    }
+    "csv": _raw["csv"],
+    "json": {"path": SCHEMA_PATH},
+    "crc": {"type": getattr(Crc16, _raw["crc"]["type"]).value},
 }

@@ -1,13 +1,19 @@
-write_port_name = 'COM5'
-read_port_name = 'COM6'
+import json
+from pathlib import Path
+
+_SERIAL_PATH = Path(__file__).parent / "serial.json"
+
+with open(_SERIAL_PATH, "r") as f:
+    _raw = json.load(f)
+
 SERIAL_CONFIG = {
-        'baudrate': 9600,
-        'write_port':{
-            'name': write_port_name,
-            'path': rf'\\.\{write_port_name}',
-        },
-        'read_port':{
-            'name': read_port_name,
-            'path': rf'\\.\{read_port_name}'        
-        },
+    "baudrate": _raw["baudrate"],
+    "write_port": {
+        "name": _raw["write_port"],
+        "path": rf'\\.\{_raw["write_port"]}',    
+    },
+    "read_port": {
+        "name": _raw["read_port"],
+        "path": rf'\\.\{_raw["read_port"]}',
+    },    
 }
