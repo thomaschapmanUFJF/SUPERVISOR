@@ -1,5 +1,5 @@
 import uvicorn
-from app.app import app
+from app.server import app
 from app.motor import motor
 import threading
 import sys
