@@ -1,0 +1,57 @@
+/* ── 3D CANVAS WRAP ── */
+.canvas-wrap {
+  flex: 1;
+  min-height: 300px;
+  background: var(--bg-inset);
+  box-shadow:
+    inset 1px 1px 0 rgba(0, 0, 0, 0.9),
+    inset -1px -1px 0 rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+}
+
+/* ── MAPA ── */
+.card-mapa {
+  display: flex;
+  flex-direction: column;
+}
+
+.mapa-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 300px;
+  box-shadow:
+    inset 1px 1px 0 rgba(0, 0, 0, 0.9),
+    inset -1px -1px 0 rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* sobrescreve o fundo padrão do leaflet (evita "flash" branco antes das tiles carregarem) */
+.mapa-wrap .leaflet-container {
+  background: var(--bg-inset);
+  font-family: var(--font-mono);
+}
+
+/* controles do mapa */
+.mapa-wrap .leaflet-control-zoom a {
+  background: var(--bg-card);
+  color: var(--txt-sec);
+  border-color: var(--border-lit);
+  font-family: var(--font-mono);
+}
+
+.mapa-wrap .leaflet-control-zoom a:hover {
+  background: var(--bg-inset);
+  color: var(--accent);
+}
+
+.mapa-wrap .leaflet-control-attribution {
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--txt-dim);
+  font-size: 8px;
+  font-family: var(--font-mono);
+}
+
+.mapa-wrap .leaflet-control-attribution a {
+  color: var(--txt-dim);
+}

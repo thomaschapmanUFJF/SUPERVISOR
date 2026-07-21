@@ -1,0 +1,214 @@
+/* ── APP ROOT ── */
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  position: relative;
+}
+
+.app-root > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── GLOW LINE ── */
+.glow-line {
+  height: 1px;
+  border: none;
+  background: var(--accent);
+  box-shadow: 0 0 8px 1px var(--accent-glow);
+}
+
+/* ── TOP STRIP ── */
+.top-strip {
+  background: var(--accent);
+  padding: 5px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.top-strip-txt {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #000;
+  font-weight: 700;
+}
+
+.top-strip-live {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: #000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-sq {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #000;
+}
+
+/* ── OFFLINE STATUS ── */
+.top-strip.offline {
+  background: #111 !important;
+  border-bottom: 1px solid var(--border);
+}
+.top-strip.offline .top-strip-txt,
+.top-strip.offline .top-strip-live {
+  color: var(--txt-dim) !important;
+}
+
+/* ── HEADER ── */
+.header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.header-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--txt-dim);
+  margin-bottom: 4px;
+}
+
+.header-time {
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  color: var(--txt-pri);
+  line-height: 1;
+}
+
+.header-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--txt-dim);
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.header-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.timer {
+  font-size: 13px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+
+/* ── MAIN GRID ── */
+.main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 300px 1fr 320px;
+  grid-template-rows: 1fr;
+  border-bottom: 1px solid var(--border);
+  min-height: 0;
+}
+
+.col-left, .col-middle, .col-right {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.col-left, .col-middle {
+  border-right: 1px solid var(--border);
+}
+
+.col-left .card-mapa {
+  height: 300px;
+  flex-shrink: 0;
+}
+
+.col-right .card-3d {
+  flex: 1;
+  min-height: 250px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.col-right .grafico-tela-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+  min-height: 220px;
+  overflow: hidden;
+}
+
+/* middle column: debug panel fills entire height */
+.col-middle {
+  flex: 1;
+}
+.col-middle .card-debug-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 24px;
+  min-height: 0;
+}
+.col-middle .debug-panel {
+  min-height: 0;
+}
+
+/* ── CARDS ── */
+.card {
+  padding: 20px 24px;
+}
+
+.card-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--txt-dim);
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+/* ── RODAPÉ ── */
+.bot-strip {
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
+  padding: 8px 24px;
+  display: flex;
+  gap: 32px;
+  flex-shrink: 0;
+}
+
+.bs-item {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--txt-dim);
+}
+
+.bs-val {
+  color: var(--accent);
+  margin-left: 6px;
+}

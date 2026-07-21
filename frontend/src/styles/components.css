@@ -1,0 +1,79 @@
+/* ── TAGS ── */
+.tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+}
+
+.tag-purple {
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+}
+
+.tag-outline {
+  border: 1px solid var(--border-lit);
+  color: var(--txt-dim);
+}
+
+.tag-err {
+  background: var(--err);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ── ERROR TOAST (react-toastify customizations) ── */
+.error-toast {
+  background: #1a0000 !important;
+  border: 1px solid var(--err) !important;
+  border-left: 4px solid var(--err) !important;
+  box-shadow: 0 0 30px var(--err-glow) !important;
+  color: var(--txt-pri) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.error-toast-body {
+  font-family: var(--font-mono) !important;
+  color: var(--txt-pri) !important;
+}
+
+/* ── DADOS INDISPONIVEIS ── */
+.dados-indisponiveis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 150px;
+  color: var(--txt-sec);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.loading-dots {
+  animation: pulse-dots 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse-dots {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ── BEVEL ── */
+.bevel {
+  border: 1px solid var(--border-lit);
+  box-shadow:
+    inset 1px 1px 0 rgba(255,255,255,0.06),
+    inset -1px -1px 0 rgba(0,0,0,0.8),
+    0 2px 8px rgba(0,0,0,0.6);
+}
+
+.bevel-inset {
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 1px 1px 0 rgba(0,0,0,0.9),
+    inset -1px -1px 0 rgba(255,255,255,0.03);
+}

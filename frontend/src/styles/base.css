@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+/* ── RESET & BASE ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #000;
+  --bg-card: #050505;
+  --bg-inset: #060606;
+  --bg-cell: #0d0d0d;
+  --border: #111;
+  --border-lit: #2a2a2a;
+  --accent: #bf00ff;
+  --accent-glow: rgba(191, 0, 255, 0.35);
+  --accent-dim: #3a0060;
+  --err: #ff2222;
+  --err-glow: rgba(255, 34, 34, 0.4);
+  --txt-pri: #f0f0f0;
+  --txt-sec: #666;
+  --txt-dim: #535353;
+  --font-mono: 'Space Mono', monospace;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  color: var(--txt-pri);
+  font-family: var(--font-mono);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── GLOBAL SCROLLBAR ── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-dim);
+}
+
+.leaflet-container img {
+  max-width: none !important;
+}
+
+.leaflet-container * {
+  box-sizing: content-box;
+}
