@@ -1,0 +1,5 @@
+{
+  "baudrate": 9600,
+  "write_port": "COM5",
+  "read_port": "COM6"
+}

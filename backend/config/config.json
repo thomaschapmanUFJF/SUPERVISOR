@@ -1,0 +1,8 @@
+{
+  "csv": {
+    "filename": "data/FLIGHT3.csv"
+  },
+  "crc": {
+    "type": "IBM"
+  }
+}
