@@ -1,6 +1,54 @@
 import { useRowStore } from '../stores/useRowStore';
 import DataUnavailable from './DataUnavailable';
 
+function formatTime(timeMs) {
+    if (timeMs == null || isNaN(Number(timeMs))) return <span className="value-main">N/A</span>;
+    const totalSeconds = Math.floor(Number(timeMs) / 1000);
+    const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
+    return <span className="value-main">{minutes}:{seconds}</span>;
+}
+
+function formatAltitude(altitudeDm) {
+    if (altitudeDm == null || isNaN(Number(altitudeDm))) return <span className="value-main">N/A</span>;
+    const meters = Math.round(Number(altitudeDm) / 10);
+    return (
+        <>
+            <span className="value-main">{meters}</span>
+            <span className="value-unit">m</span>
+        </>
+    );
+}
+
+function formatVelocity(velDmS) {
+    if (velDmS == null || isNaN(Number(velDmS))) return <span className="value-main">N/A</span>;
+    const mS = (Number(velDmS) / 10).toFixed(1);
+    return (
+        <>
+            <span className="value-main">{mS}</span>
+            <span className="value-unit">m/s</span>
+        </>
+    );
+}
+
+function formatVoltage(voltageRaw) {
+    if (voltageRaw == null || isNaN(Number(voltageRaw))) return <span className="value-main">N/A</span>;
+    const volts = Number(voltageRaw).toFixed(2);
+    return (
+        <>
+            <span className="value-main">{volts}</span>
+            <span className="value-unit">V</span>
+        </>
+    );
+}
+
+function getVoltageThreshold(volts) {
+    if (volts == null) return 'metric-nominal';
+    if (volts < 3.80) return 'metric-danger';
+    if (volts < 3.85) return 'metric-warning';
+    return 'metric-nominal';
+}
+
 export default function DebugPanel() {
     const telemetry = useRowStore((state) => state.atual);
     const isLive = useRowStore((state) => state.isLive);
@@ -9,36 +57,13 @@ export default function DebugPanel() {
         return <DataUnavailable />;
     }
 
-    const formatValue = (value, decimals = 4) => {
-        if (typeof value !== 'number') return 'N/A';
-        return value.toFixed(decimals);
-    };
-
-    const getValueClass = (value, warningThreshold, dangerThreshold) => {
-        if (value === null || value === undefined) return 'debug-value';
-        if (value > dangerThreshold) return 'debug-value danger';
-        if (value > warningThreshold) return 'debug-value warning';
-        return 'debug-value';
-    };
-
-    const qw = telemetry?.qw;
-    const qx = telemetry?.qx;
-    const qy = telemetry?.qy;
-    const qz = telemetry?.qz;
-
-    const altitude = telemetry ? telemetry.altitude / 10 : null;
-    const velocity = telemetry ? telemetry.vel_vertical / 10 : null;
     const battery = telemetry ? telemetry.voltage_int / 10 : null;
-
-    const gpsLat = telemetry?.latitude;
-    const gpsLon = telemetry?.longitude;
-
     const timestamp = telemetry?.timestamp || 'N/A';
 
     return (
         <div className={`debug-panel ${isLive ? 'online' : 'offline'}`}>
             <div className={`debug-header ${isLive ? 'online' : 'offline'}`}>
-                <span className="debug-title">⬢ TELEMETRY DEBUG</span>
+                <span className="debug-title">⬢ TELEMETRY</span>
                 <div className="debug-status">
                     {isLive && <span className="debug-dot"></span>}
                     {isLive ? 'LIVE' : 'OFFLINE'}
@@ -46,58 +71,26 @@ export default function DebugPanel() {
             </div>
 
             <div className="debug-grid">
-                <div className="debug-item">
-                    <span className="debug-key">QW</span>
-                    <span className="debug-value">{formatValue(qw)}</span>
+                <div className="metric-card metric-nominal">
+                    <span className="debug-key">TIME</span>
+                    <div className="debug-value">{formatTime(telemetry.time)}</div>
                 </div>
-                <div className="debug-item">
-                    <span className="debug-key">QX</span>
-                    <span className="debug-value">{formatValue(qx)}</span>
-                </div>
-                <div className="debug-item">
-                    <span className="debug-key">QY</span>
-                    <span className="debug-value">{formatValue(qy)}</span>
-                </div>
-                <div className="debug-item">
-                    <span className="debug-key">QZ</span>
-                    <span className="debug-value">{formatValue(qz)}</span>
-                </div>
-
-                {/* Flight data */}
-                <div className="debug-item">
+                <div className="metric-card metric-nominal">
                     <span className="debug-key">ALT</span>
-                    <span className={getValueClass(altitude, 500, 1000)}>
-                        {formatValue(altitude, 2)} m
-                    </span>
+                    <div className="debug-value">{formatAltitude(telemetry.altitude)}</div>
                 </div>
-                <div className="debug-item">
+                <div className="metric-card metric-nominal">
                     <span className="debug-key">VEL</span>
-                    <span className={getValueClass(velocity, 50, 100)}>
-                        {formatValue(velocity, 2)} m/s
-                    </span>
+                    <div className="debug-value">{formatVelocity(telemetry.vel_vertical)}</div>
                 </div>
-
-                {/* System data */}
-                <div className="debug-item">
+                <div className={`metric-card ${getVoltageThreshold(battery)}`}>
                     <span className="debug-key">BATT</span>
-                    <span className={getValueClass(battery, 2.0, 1.0)}>
-                        {formatValue(battery, 1)} V
-                    </span>
-                </div>
-
-                {/* GPS */}
-                <div className="debug-item">
-                    <span className="debug-key">LAT</span>
-                    <span className="debug-value">{formatValue(gpsLat, 6)}</span>
-                </div>
-                <div className="debug-item">
-                    <span className="debug-key">LON</span>
-                    <span className="debug-value">{formatValue(gpsLon, 6)}</span>
+                    <div className="debug-value">{formatVoltage(battery)}</div>
                 </div>
             </div>
 
             <div className="debug-timestamp">
-                ⏱ {timestamp} · update: 20Hz
+                ⏱ {timestamp} · 20Hz
             </div>
         </div>
     );
