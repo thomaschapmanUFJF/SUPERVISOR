@@ -20,7 +20,7 @@ async def generator(state_store):
             yield state_store.get_msg()
 
         yield ": keepalive\n\n"
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.0005)
 
 def getter(state_store):
     return StreamingResponse(

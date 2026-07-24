@@ -33,6 +33,9 @@
     "accel_int": "uint8",
     "status": "uint8",
     "voltage_int": "uint8",
-    "fix": "uint8"
+    "fix": "uint8",
+    "pressure": "float32",
+    "rotation": "float32",
+    "accel_y": "float32"
   }
 }

@@ -78,22 +78,22 @@ def generate_packages():
             apogeu = max_altitude
             fix = 0
             valores = {
-                            'time':         time,
-                            'latitude':     latitude,
-                            'longitude':    longitude,
-                            'altitude':     int(altitude * 10),
-                            'apogeu':       int(apogeu * 10),
-                            'vel_vertical': int(vel_vertical * 10),
-                            'qw':           qw,
-                            'qx':           qx,
-                            'qy':           qy,
-                            'qz':           qz,
-                            'accel_int':    max(min(int(accel * 10), MAX_ACCEL), 0),
-                            'status':       int(row['Status']),
-                            'voltage_int':  int(float(row['Voltage']) * 10),
-                            'fix':          0,
-                        }            
-            payload = struct.pack(PAYLOAD_FORMAT, *[valores[k] for k in JSON_SCHEMA.keys()])
+                'time':         time,
+                'latitude':     latitude,
+                'longitude':    longitude,
+                'altitude':     int(altitude * 10),
+                'apogeu':       int(apogeu * 10),
+                'vel_vertical': int(vel_vertical * 10),
+                'qw':           qw,
+                'qx':           qx,
+                'qy':           qy,
+                'qz':           qz,
+                'accel_int':    max(min(int(accel * 10), MAX_ACCEL), 0),
+                'status':       int(row['Status']),
+                'voltage_int':  int(float(row['Voltage']) * 10),
+                'fix':          0,
+            }            
+            payload = struct.pack(PAYLOAD_FORMAT, *[valores.get(k, 0.0 if 'float' in str(JSON_SCHEMA.get(k, '')) else 0) for k in JSON_SCHEMA.keys()])
             
             previous_altitude = altitude
             previous_time = time
