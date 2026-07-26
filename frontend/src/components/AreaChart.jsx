@@ -3,21 +3,6 @@ import { useRowStore } from '../stores/useRowStore';
 import { useShallow } from 'zustand/react/shallow';
 import DataUnavailable from './DataUnavailable';
 
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="chart-tooltip">
-        <p className="ct-label">Tempo: {label}s</p>
-        <p className="ct-val">
-          {payload[0].value.toFixed(1)}
-          <span>m</span>
-        </p>
-      </div>
-    );
-  }
-  return null;
-};
-
 export default function ChartPanel() {
   const hasData = useRowStore((state) => state.hasData);
   const historicoAltitude = useRowStore((state) => state.historicoAltitude, useShallow);
@@ -59,7 +44,11 @@ export default function ChartPanel() {
                 isAnimationActive={false}
               />
               <YAxis stroke="#666" tick={{ fill: '#666', fontSize: 10 }} isAnimationActive={false} />
-              <Tooltip content={<CustomTooltip />} isAnimationActive={false} />
+              <Tooltip
+                labelFormatter={(val) => `Tempo: ${val}s`}
+                formatter={(val) => [`${val.toFixed(1)}m`, '']}
+                isAnimationActive={false}
+              />
               <Area
                 type="monotone"
                 dataKey="altitude"
