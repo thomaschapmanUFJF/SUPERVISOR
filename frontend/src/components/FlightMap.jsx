@@ -48,14 +48,11 @@ export default function FlightMap() {
   const cx = svgWidth / 2;
   const cy = svgHeight / 2;
 
-  // Helper to project cartesian meters to SVG screen coordinates
   const mapX = (mX) => cx + (mX / range) * (svgWidth / 2);
-  const mapY = (mY) => cy - (mY / range) * (svgHeight / 2); // Flip Y axis for SVG
+  const mapY = (mY) => cy - (mY / range) * (svgHeight / 2);
 
-  // Build SVG polyline points string
   const polylinePoints = pathPoints.map((p) => `${mapX(p.x)},${mapY(p.y)}`).join(' ');
 
-  // Grid tick markers for concentric distance circles/lines
   const gridStepMeters = range <= 25 ? 5 : range <= 100 ? 25 : range <= 500 ? 100 : 250;
   const gridSteps = [];
   for (let m = gridStepMeters; m < range; m += gridStepMeters) {
