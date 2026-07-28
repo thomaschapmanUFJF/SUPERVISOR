@@ -1,13 +1,14 @@
 import asyncio
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-import fastapi.middleware.cors as cors
 from .state import last_row, last_error
 
 app = FastAPI()
 app.add_middleware(
-    cors.CORSMiddleware,
-    allow_origins=["*"],
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origin_regex=r"https://.*\.app\.github\.dev",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
