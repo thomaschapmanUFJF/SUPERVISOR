@@ -35,13 +35,12 @@ export default function FlightMap() {
       y: (p.latitude - startLat) * LAT_M_PER_DEG
     }));
 
-  const maxDisplacement = Math.max(
-    ...pathPoints.flatMap((p) => [Math.abs(p.x), Math.abs(p.y)]),
-    Math.abs(currentX),
-    Math.abs(currentY),
-    15
-  );
-  const range = maxDisplacement * 1.3;
+const maxDisplacement = Math.max(
+  ...pathPoints.map((p) => Math.hypot(p.x, p.y)),
+  Math.hypot(currentX, currentY),
+  15
+);
+const range = maxDisplacement * 1.35;
 
   const svgWidth = 400;
   const svgHeight = 400;

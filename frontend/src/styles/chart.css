@@ -61,33 +61,45 @@
 
 /* ── TOOLTIP ── */
 .chart-tooltip {
-  background: #000;
+  /* Fundo escuro profundo com alta opacidade e blur */
+  background: rgba(15, 15, 22, 0.95);
+  backdrop-filter: blur(8px);
+  
+  /* Borda neon com brilho ajustado */
   border: 1px solid var(--accent);
-  box-shadow: 0 0 8px var(--accent-glow);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.8), 0 0 10px var(--accent-glow);
+  
   padding: 8px 12px;
   font-family: var(--font-mono);
+  
+  /* Garante que o tooltip fique sempre no topo de tudo */
+  z-index: 50;
+  pointer-events: none;
 }
 
 .ct-label {
-  font-size: 8px;
-  color: var(--txt-sec);
-  letter-spacing: 2px;
+  font-size: 9px;
+  color: var(--txt-sec, rgba(255, 255, 255, 0.6));
+  letter-spacing: 1.5px;
   text-transform: uppercase;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
 .ct-val {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   color: var(--accent);
+  display: flex;
+  align-items: baseline;
 }
 
 .ct-val span {
-  font-size: 9px;
-  color: var(--txt-sec);
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--txt-sec, rgba(255, 255, 255, 0.5));
   margin-left: 4px;
 }
-
 /* ── AREA CHART COMPONENT ── */
 .area-chart-wrapper {
   width: 100%;
