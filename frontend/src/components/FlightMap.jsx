@@ -15,6 +15,7 @@ export default function FlightMap() {
   );
 
   const hasValidGPS = posicaoAtual !== null &&
+    posicaoAtual.latitude != null && posicaoAtual.longitude != null &&
     (posicaoAtual.latitude !== 0 || posicaoAtual.longitude !== 0);
 
   if (!hasValidGPS) {

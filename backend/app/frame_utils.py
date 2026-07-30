@@ -27,6 +27,8 @@ def calculate_crc(type, length, payload):
 
 
 def calculate_frame_crc(frame):
+    if len(frame) <= HEADER["length"]["idx"]:
+            return False    
     type = frame[HEADER["type"]["idx"]]
     length = frame[HEADER["length"]["idx"]]
     payload = frame[HEADER["size"] : HEADER["size"] + length]
