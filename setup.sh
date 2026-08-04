@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Equivalente do setup.bat para Linux / GitHub Codespaces.
-# Instala as dependencias do backend (Python) e do frontend (Node).
+# Setup script for Linux / GitHub Codespaces.
+# Installs backend (Python) and frontend (Node.js) dependencies.
 
-set -e  # para o script se algum comando falhar
+set -e  # Exit immediately if a command exits with a non-zero status
 
 echo "=============================================="
 echo "               INICIANDO SETUP"
@@ -10,29 +10,36 @@ echo "=============================================="
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Descobre se e' "python" ou "python3"
+# Discover Python binary
 if command -v python3 &> /dev/null; then
     PY=python3
 elif command -v python &> /dev/null; then
     PY=python
 else
-    echo "ERRO: nenhum interpretador Python encontrado no PATH!"
+    echo "ERRO: Nenhum interpretador Python encontrado no PATH!"
     exit 1
 fi
 
-echo "[1] Instalando dependencias do Python ($PY)..."
+echo "[1] Configurando ambiente Python ($PY)..."
 cd "$SCRIPT_DIR/backend"
 
-# --break-system-packages e' necessario em imagens Debian/Ubuntu recentes
-# (como as usadas pelo Codespaces), que bloqueiam pip fora de venv por padrao.
-if ! $PY -m pip install "fastapi[standard]" pyserial crc --break-system-packages 2>/tmp/pip_err.log; then
-    if grep -q "externally-managed-environment" /tmp/pip_err.log; then
-        echo "Ambiente gerenciado externamente detectado, tentando novamente..."
-    fi
-    $PY -m pip install "fastapi[standard]" pyserial crc --break-system-packages || {
-        echo "ERRO: instalacao das dependencias Python falhou!"
-        exit 1
-    }
+# Recommended: Create and activate a virtual environment
+if [ ! -d "venv" ]; then
+    echo "Criando ambiente virtual (venv)..."
+    $PY -m venv venv
+fi
+
+# Activate venv for this script session
+source venv/bin/activate
+
+echo "Instalando dependências do Python..."
+pip install --upgrade pip
+
+if [ -f "requirements.txt" ]; then
+    pip install -r requirements.txt
+else
+    # Lean backend installation for SSE + Serial + Utilities
+    pip install "fastapi" "uvicorn[standard]" "pyserial" "crc"
 fi
 
 echo
@@ -40,12 +47,12 @@ echo "[2] Instalando dependencias do React..."
 cd "$SCRIPT_DIR/frontend"
 
 if [ ! -d "." ]; then
-    echo "ERRO: pasta 'frontend' nao encontrada!"
+    echo "ERRO: Pasta 'frontend' não encontrada!"
     exit 1
 fi
 
-rm -rf node_modules package-lock.json
-npm install
+# Fast & deterministic dependency installation
+npm ci || npm install
 
 echo
 echo "=============================================="
