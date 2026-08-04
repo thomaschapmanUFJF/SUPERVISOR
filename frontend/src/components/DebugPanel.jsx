@@ -57,7 +57,10 @@ export default function DebugPanel() {
         return <DataUnavailable />;
     }
 
-    const battery = telemetry ? telemetry.voltage_int / 10 : null;
+    const batteryValue = telemetry?.voltage ?? telemetry?.voltage_int;
+    const battery = batteryValue == null ? null : Number(batteryValue) / 10;
+    const altitudeValue = telemetry?.kf_altitude ?? telemetry?.altitude;
+    const velocityValue = telemetry?.kf_vel_vertical ?? telemetry?.vel_vertical;
     const timestamp = telemetry?.timestamp || 'N/A';
 
     return (
@@ -77,11 +80,11 @@ export default function DebugPanel() {
                 </div>
                 <div className="metric-card metric-nominal">
                     <span className="debug-key">ALT</span>
-                    <div className="debug-value">{formatAltitude(telemetry.altitude)}</div>
+                    <div className="debug-value">{formatAltitude(altitudeValue)}</div>
                 </div>
                 <div className="metric-card metric-nominal">
                     <span className="debug-key">VEL</span>
-                    <div className="debug-value">{formatVelocity(telemetry.vel_vertical)}</div>
+                    <div className="debug-value">{formatVelocity(velocityValue)}</div>
                 </div>
                 <div className={`metric-card ${getVoltageThreshold(battery)}`}>
                     <span className="debug-key">BATT</span>

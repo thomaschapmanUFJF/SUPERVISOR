@@ -48,11 +48,11 @@ export const useRowStore = create((set) => ({
                 : state.historicoMapaPosicao;
 
             const calcularOrientacao = () => {
-                const { qx, qy, qz, qw } = telemetria || {};
+                const { q1, q2, q3, q4 } = telemetria || {};
                 
-                if (isInvalidQuaternion(qx, qy, qz, qw)) return state.orientacaoFoguete;
+                if (isInvalidQuaternion(q2, q3, q4, q1)) return state.orientacaoFoguete;
 
-                const candidatoQ = { x: qx, y: qy, z: qz, w: qw };
+                const candidatoQ = { x: q2, y: q3, z: q4, w: q1 };
                 if (exceedsDeadband(lastApprovedQuaternion, candidatoQ)) {
                     lastApprovedQuaternion = candidatoQ;
                     return candidatoQ; 
@@ -71,7 +71,7 @@ export const useRowStore = create((set) => ({
                 posicaoInicial,
                 historicoMapaPosicao: novoHistoricoMapa,
                 historicoAltitude: atualizaGrafico
-                    ? [...state.historicoAltitude, { time: Math.round(telemetria.time / 1000), altitude: telemetria.altitude }].slice(-MAX_PONTOS)
+                    ? [...state.historicoAltitude, { time: Math.round(telemetria.time / 1000), altitude: telemetria.kf_altitude / 10 }].slice(-MAX_PONTOS)
                     : state.historicoAltitude,
                 historicoPosicao: atualizaGrafico
                     ? [...state.historicoPosicao, novaPosicao].slice(-MAX_PONTOS)
