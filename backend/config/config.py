@@ -1,16 +1,34 @@
 import json
-from crc import Crc16
 from pathlib import Path
 
 _CONFIG_DIR = Path(__file__).parent
 _CONFIG_PATH = _CONFIG_DIR / "config.json"
-SCHEMA_PATH = _CONFIG_DIR.parent.parent / "schema.json"
 
-with open(_CONFIG_PATH, "r") as f:
-    _raw = json.load(f)
+
+def _load_config():
+    with _CONFIG_PATH.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+_RAW = _load_config()
 
 CONFIG = {
-    "csv": _raw["csv"],
-    "json": {"path": SCHEMA_PATH},
-    "crc": {"type": getattr(Crc16, _raw["crc"]["type"]).value},
+    "csv": {
+        "filename": _RAW["csv"]["filename"],
+        "path": _RAW["csv"]["test_path"],        
+    },
+    "serial": {
+        "baudrate": _RAW["serial"]["baudrate"],
+        "write_port": {
+            "name": _RAW["serial"]["write_port"]["name"],
+            "path": _RAW["serial"]["write_port"]["path"],
+        },
+        "read_port": {
+            "name": _RAW["serial"]["read_port"]["name"],
+            "path": _RAW["serial"]["read_port"]["path"],
+        },
+    },
+    "fieldnames": _RAW.get("FIELDNAMES", [])
 }
+
+

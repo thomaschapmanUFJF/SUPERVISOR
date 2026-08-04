@@ -2,9 +2,10 @@ import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
-from .state import last_row, last_error
+from .state import last_error, last_row
 
 app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
@@ -14,18 +15,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-async def generator(state_store):
+
+async def event_stream_generator(state_store):
     while True:
         current = state_store.get()
         if current:
-            yield state_store.get_msg()
+            yield state_store.to_sse_event()
 
         yield ": keepalive\n\n"
         await asyncio.sleep(0.0005)
 
-def getter(state_store):
+
+def create_sse_response(state_store) -> StreamingResponse:
     return StreamingResponse(
-        generator(state_store),
+        event_stream_generator(state_store),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
@@ -34,11 +37,12 @@ def getter(state_store):
         },
     )
 
+
 @app.get("/sse/rows")
-async def get_rows():
-    return getter(last_row)
+async def stream_rows():
+    return create_sse_response(last_row)
+
 
 @app.get("/sse/errors")
-async def get_error():
-    return getter(last_error)
-
+async def stream_errors():
+    return create_sse_response(last_error)

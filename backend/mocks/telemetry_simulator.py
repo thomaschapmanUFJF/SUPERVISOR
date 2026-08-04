@@ -1,18 +1,16 @@
 import csv
-import struct
 import serial
 import sys
 import math
+import json
 import time as time_module
-from app.frame_utils import build_frame, add_noise
-from app.schema import PAYLOAD_FORMAT, JSON_SCHEMA
-from config.serial import SERIAL_CONFIG
-from config.test import TEST_CONFIG
+from config.config import CONFIG
 
-BAUDRATE = SERIAL_CONFIG['baudrate']
-WRITE_PORT_PATH = SERIAL_CONFIG['write_port']['path']
-CSV_PATH = TEST_CONFIG['csv']['path']
-MAX_ACCEL = TEST_CONFIG['max_accel']
+baudrate = CONFIG["serial"]["baudrate"]
+write_port_path = CONFIG["serial"]["write_port"]["path"]
+csv_path = CONFIG["csv"]["path"]
+
+MAX_ACCEL = 255
 
 
 def euler_to_quaternion(rotation_x, rotation_y, rotation_z):
@@ -49,8 +47,8 @@ def vertical_velocity(current_altitude, previous_altitude, current_time, previou
 def average_altitude(gps_altitude, bmp_altitude):
     return (gps_altitude + bmp_altitude) / 2
 
-def generate_packages():
-    with open(CSV_PATH, 'r') as file:
+def generate_telemetry():
+    with open(csv_path, 'r') as file:
         reader = csv.DictReader(file)
         next(reader)
         previous_altitude = 0
@@ -77,41 +75,35 @@ def generate_packages():
             vel_vertical = vertical_velocity(altitude, previous_altitude, time, previous_time)
             apogeu = max_altitude
             fix = 0
-            valores = {
-                'time':         time,
-                'latitude':     latitude,
-                'longitude':    longitude,
-                'altitude':     int(altitude * 10),
-                'apogeu':       int(apogeu * 10),
-                'vel_vertical': int(vel_vertical * 10),
-                'qw':           qw,
-                'qx':           qx,
-                'qy':           qy,
-                'qz':           qz,
-                'accel_int':    max(min(int(accel * 10), MAX_ACCEL), 0),
-                'status':       int(row['Status']),
-                'voltage_int':  int(float(row['Voltage']) * 10),
-                'fix':          0,
-            }            
-            payload = struct.pack(PAYLOAD_FORMAT, *[valores.get(k, 0.0 if 'float' in str(JSON_SCHEMA.get(k, '')) else 0) for k in JSON_SCHEMA.keys()])
-            
+            values = {
+                'time':            time,
+                'latitude':        latitude,
+                'longitude':       longitude,
+                'kf_altitude':     int(altitude * 10),
+                'kf_apogee':       int(apogeu * 10),
+                'kf_vel_vertical': int(vel_vertical * 10),
+                'q1':              qw,
+                'q2':              qx,
+                'q3':              qy,
+                'q4':              qz,
+                'accel':           max(min(int(accel * 10), MAX_ACCEL), 0),
+                'status':          int(row['Status']),
+                'voltage':         int(float(row['Voltage']) * 10),
+                'fix':             0,
+            }
+                    
             previous_altitude = altitude
             previous_time = time
-            frame = build_frame(payload)
-            yield frame
-            time_module.sleep(0.05)
 
-def send_package_with_noise():
-    for i, package in enumerate(generate_packages()):
-        yield add_noise(package)
-    print(i)
+            yield values
+            time_module.sleep(0.05)
 
 def to_virtual_port():
     port = None
     try:
-        port = serial.Serial(port=WRITE_PORT_PATH, baudrate=BAUDRATE, timeout=1)
-        for package in send_package_with_noise():
-            if package: port.write(package)
+        port = serial.Serial(port=write_port_path, baudrate=baudrate, timeout=1)
+        for package in generate_packages():
+            port.write(package)
     except KeyboardInterrupt:
         print('INTERROMPENDO O SIMULADOR')
         sys.exit(0)

@@ -1,8 +1,23 @@
 {
   "csv": {
-    "filename": "data/FLIGHT3.csv"
+    "filename": "data/FLIGHT3.csv",
+    "test_path": "data/FLIGHT2.csv"
   },
-  "crc": {
-    "type": "IBM"
-  }
+  "serial": {
+    "baudrate": 9600,
+    "write_port": {
+      "name": "COM5",
+      "path": "\\\\.\\COM5"
+    },
+    "read_port": {
+      "name": "COM6",
+      "path": "\\\\.\\COM6"
+    }
+  },
+  "FIELDNAMES": [
+    "time", "latitude", "longitude",
+    "kf_altitude", "kf_apogee", "kf_vel_vertical",
+    "q1", "q2", "q3", "q4",
+    "accel", "status", "voltage", "fix"
+  ]
 }
