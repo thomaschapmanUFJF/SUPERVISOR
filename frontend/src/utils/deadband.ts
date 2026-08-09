@@ -1,10 +1,15 @@
 const DEADBAND_RADIANOS = 0.5 * (Math.PI / 180);
 
-export function isInvalidQuaternion(x, y, z, w) {
-    if (x === undefined || y === undefined || z === undefined || w === undefined) return true;
-    if (x === null || y === null || z === null || w === null) return true;
-    if (x === 0 && y === 0 && z === 0 && w === 0) return true;
+export function isInvalidQuaternion(qx, qy, qz, qw) {
+    if (qx === undefined || qy === undefined || qz === undefined || qw === undefined) return true;
+    if (qx === null || qy === null || qz === null || qw === null) return true;
+    if (qx === 0 && qy === 0 && qz === 0 && qw === 0) return true;
     return false;
+}
+
+export function isInvalidQuaternionObject(q) {
+    if (!q) return true;
+    return isInvalidQuaternion(q?.x, q?.y, q?.z, q?.w);
 }
 
 export function calculateAngleDifference(q1, q2) {
@@ -14,26 +19,25 @@ export function calculateAngleDifference(q1, q2) {
 }
 
 export function exceedsDeadband(currentQ, newQ) {
-    if (!currentQ) return true;
+    if (isInvalidQuaternionObject(currentQ) || isInvalidQuaternionObject(newQ)) return true;
     return calculateAngleDifference(currentQ, newQ) >= DEADBAND_RADIANOS;
 }
 
-export function isEqualQuaternion(lastQ, x, y, z, w) {
-    if (!lastQ) return false;
-
+export function isEqualQuaternion(currentQ, x, y, z, w) {
+    if (isInvalidQuaternionObject(currentQ) || isInvalidQuaternion(x,y,z,w)) return false;
     const isExactMatch = 
-        lastQ.x === x && 
-        lastQ.y === y && 
-        lastQ.z === z && 
-        lastQ.w === w;
+        currentQ.x === x && 
+        currentQ.y === y && 
+        currentQ.z === z && 
+        currentQ.w === w;
 
     if (isExactMatch) return true;
 
     const isAntipodalMatch = 
-        lastQ.x === -x && 
-        lastQ.y === -y && 
-        lastQ.z === -z && 
-        lastQ.w === -w;
+        currentQ.x === -x && 
+        currentQ.y === -y && 
+        currentQ.z === -z && 
+        currentQ.w === -w;
 
     return isAntipodalMatch;
 }

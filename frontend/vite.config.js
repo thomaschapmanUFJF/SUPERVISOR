@@ -13,4 +13,8 @@ export default defineConfig({
     port: 4173,
     strictPort: true,
   },
+  test: {
+    globals: true,
+    environment: 'node'
+  },
 })
