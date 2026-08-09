@@ -1,31 +1,20 @@
-import { useRef, Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { Environment } from '@react-three/drei';
-import L from 'leaflet';
-import iconUrl from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
 import { useRowStore } from './stores/useRowStore';
 import AreaChart from './components/AreaChart'
 import RocketModel from './components/RocketModel';
 import DebugPanel from './components/DebugPanel';
 import FlightMap from './components/FlightMap';
-import DataUnavailable from './components/DataUnavailable';
+import Placeholder from './components/Placeholder';
 import useErrorSSE from './hooks/useErrorSSE';
 import useRowSSE from './hooks/useRowSSE';
 import useErrorToast from './hooks/useErrorToast';
-
 function HeaderTime() {
   const time = useRowStore((state) => state.atual?.time);
   const formattedTime = time != null && !isNaN(Number(time)) ? Math.round(Number(time)) : (time ?? 'N/A');
   return <span>{formattedTime}</span>;
 }
 
-export default function App() {
-  L.Icon.Default.mergeOptions({ iconUrl, shadowUrl: iconShadow });
+export default function MainScreen() {
   const isLive = useRowStore((state) => state.isLive);
-  const hasData = useRowStore((state) => state.hasData);
-  const canvasRef = useRef();
 
   useRowSSE();
   useErrorSSE();
@@ -35,48 +24,28 @@ export default function App() {
     <div className="app-root">
       <main className="main-grid">
         <div className="top-row">
+
           <div className="col-telemetry">
             <DebugPanel />
           </div>
 
-          {/* COLUNA CENTRO: MAPA DE VOO */}
           <div className="col-map">
-            <section className="card card-mapa">
-              <div className="card-label">rastreamento · GPS</div>
-              <div className="mapa-wrap">
-                <FlightMap />
-              </div>
-            </section>
+            <FlightMap />
           </div>
 
-          {/* COLUNA DIREITA: ORIENTAÇÃO 3D */}
           <div className="col-3d">
-            <section className="card card-3d">
-              <div className="card-label">orientação · IMU</div>
-              <div className="canvas-wrap" ref={canvasRef} style={{ flex: 1, minHeight: 0 }}>
-                {!hasData ? (
-                  <DataUnavailable />
-                ) : (
-                  <Canvas camera={{ position: [0, 0, 5], fov: 45 }} style={{ height: '100%', width: '100%' }}>
-                    <Suspense fallback={null}>
-                      <Environment preset="city" />
-                      <ambientLight intensity={0.4} />
-                      <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
-                      <directionalLight position={[-5, 5, -5]} intensity={0.4} />
-                      <RocketModel />
-                      {/* Referência estática de orientação */}
-                      <axesHelper args={[2]} />
-                    </Suspense>
-                  </Canvas>
-                )}
-              </div>
-            </section>
+            <RocketModel />
           </div>
         </div>
 
-        {/* PARTE INFERIOR: GRÁFICO 100% LARGURA */}
+        {/* PARTE INFERIOR: GRÁFICO E PLACEHOLDER LATERAIS */}
         <div className="bottom-row">
-          <AreaChart />
+          <section className="grafico-tela-wrap">
+            <AreaChart />
+          </section>
+
+                <Placeholder />
+
         </div>
       </main>
 

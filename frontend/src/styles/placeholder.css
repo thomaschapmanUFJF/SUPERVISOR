@@ -1,0 +1,13 @@
+.placeholder-wrap {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.placeholder-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  justify-items: center;
+  min-height: 0;
+}

@@ -1,0 +1,37 @@
+.test {
+    background-color: black;
+    color: blue;
+    font-size: large;
+    box-sizing: border-box;
+    width: 80vw;
+    height: 80vh;
+    display: flex;
+    flex-direction:column;
+}
+
+.test__background {
+    flex:1;
+    font-size: medium;
+    background-color: whitesmoke;
+    width:100%;
+    overflow: hidden;
+}
+
+.test__title {
+    flex:2;
+    font-size: auto;
+    color: black;
+    box-sizing: border-box;
+    width:340px;
+    background-color:aliceblue;
+}
+
+.test__font {
+        flex: 1;
+    font-size: small;
+    color: gray;
+}
+
+.test__value {
+    color: purple;
+}
