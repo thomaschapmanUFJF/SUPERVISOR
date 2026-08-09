@@ -1,4 +1,5 @@
 import asyncio
+import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -17,13 +18,22 @@ app.add_middleware(
 
 
 async def event_stream_generator(state_store):
+    last_data = None
+    last_keepalive = time.monotonic()
+
     while True:
         current = state_store.get()
-        if current:
-            yield state_store.to_sse_event()
 
-        yield ": keepalive\n\n"
-        await asyncio.sleep(0.0005)
+        if current and current != last_data:
+            yield state_store.to_sse_event()
+            last_data = current.copy()
+
+        now = time.monotonic()
+        if now - last_keepalive >= 15.0:
+            yield ": keepalive\n\n"
+            last_keepalive = now
+
+        await asyncio.sleep(0.1)
 
 
 def create_sse_response(state_store) -> StreamingResponse:
