@@ -6,14 +6,7 @@ import DataUnavailable from './DataUnavailable';
 
 export default function ChartPanel() {
   const hasData = useRowStore((state) => state.hasData);
-  const historicoAltitude = useRowStore(useShallow((state) => state.historicoAltitude));
-
-  const historicoEmMetros = useMemo(() => {
-    return historicoAltitude.map((p) => ({
-      time: p.time,
-      altitude: p.altitude / 10
-    }));
-  }, [historicoAltitude]);
+  const altitudeHistory = useRowStore(useShallow((state) => state.altitudeHistory));
 
   if (!hasData) {
     return (
@@ -30,7 +23,7 @@ export default function ChartPanel() {
       <div className="grafico-content">
         <div className="area-chart-wrapper">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={historicoEmMetros} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+            <AreaChart data={altitudeHistory} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorAltitude" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#bf00ff" stopOpacity={0.4} />

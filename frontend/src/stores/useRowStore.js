@@ -1,82 +1,105 @@
 import { create } from 'zustand';
 import { isInvalidQuaternion, exceedsDeadband } from '../utils/deadband';
 
-const MAX_PONTOS = 50;
-const MAX_MAPA_PONTOS = 1000;
-const THROTTLE_MAPA = 3;
-const THROTTLE_GRAFICO = 60;
+const MAX_POINTS = 50;
+const MAX_MAP_POINTS = 1000;
+
+const MAP_THROTTLE = 300; // ms
+const CHART_THROTTLE = 500; // ms
 
 let liveTimeout = null;
-let lastApprovedQuaternion = null; 
+let lastApprovedQuaternion = null;
+let lastMapUpdateTime = 0;
+let lastChartUpdateTime = 0;
 
 export const useRowStore = create((set) => ({
-    atual: null,
-    orientacaoFoguete: null,
-    posicaoAtual: null,
-    posicaoInicial: null,
-    historicoAltitude: [],
-    historicoPosicao: [],
-    historicoMapaPosicao: [],
-    historicoQuaternions: [],
-    contador: 0,
-    isLive: false,
-    hasData: false,
+  // State
+  current: null,
+  rocketOrientation: null,
+  currentCoordinates: null,
+  initialCoordinates: null,
+  altitudeHistory: [],
+  mapCoordinatesHistory: [],
+  isLive: false,
+  hasData: false,
 
-    adicionar: (telemetria) => {
-        if (liveTimeout) clearTimeout(liveTimeout);
-        liveTimeout = setTimeout(() => {
-            useRowStore.setState({ isLive: false });
-        }, 2000);
+  // Action
+  addTelemetry: (telemetry) => {
+    if (liveTimeout) clearTimeout(liveTimeout);
+    liveTimeout = setTimeout(() => {
+      useRowStore.setState({ isLive: false });
+    }, 2000);
 
-        set((state) => {
-            const proximoContador = state.contador + 1;
-            const atualizaMapa = proximoContador % THROTTLE_MAPA === 0;
-            const atualizaGrafico = proximoContador % THROTTLE_GRAFICO === 0;
-            const novaPosicao = { latitude: telemetria.latitude, longitude: telemetria.longitude };
+    set((state) => {
+      const now = performance.now();
+      const shouldUpdateMap = now - lastMapUpdateTime >= MAP_THROTTLE;
+      const shouldUpdateChart = now - lastChartUpdateTime >= CHART_THROTTLE;
 
-            const temGpsValido = telemetria.latitude !== 0 && telemetria.longitude !== 0;
-            const posicaoInicial = state.posicaoInicial ??
-                (temGpsValido ? novaPosicao : null);
+      if (shouldUpdateMap) lastMapUpdateTime = now;
+      if (shouldUpdateChart) lastChartUpdateTime = now;
 
-            const ultimaPosicaoMapa = state.historicoMapaPosicao[state.historicoMapaPosicao.length - 1];
-            const hasMoved = !ultimaPosicaoMapa ||
-                (ultimaPosicaoMapa.latitude !== novaPosicao.latitude &&
-                 ultimaPosicaoMapa.longitude !== novaPosicao.longitude);
+      const isValidGps = telemetry.latitude !== 0 && telemetry.longitude !== 0;
 
-            const novoHistoricoMapa = (atualizaMapa && temGpsValido && hasMoved)
-                ? [...state.historicoMapaPosicao, novaPosicao].slice(-MAX_MAPA_PONTOS)
-                : state.historicoMapaPosicao;
+      const validCoordinates = isValidGps
+        ? { latitude: telemetry.latitude, longitude: telemetry.longitude }
+        : state.currentCoordinates;
 
-            const calcularOrientacao = () => {
-                const { q1, q2, q3, q4 } = telemetria || {};
-                
-                if (isInvalidQuaternion(q2, q3, q4, q1)) return state.orientacaoFoguete;
+      const initialCoordinates =
+        state.initialCoordinates ?? (isValidGps ? validCoordinates : null);
 
-                const candidatoQ = { x: q2, y: q3, z: q4, w: q1 };
-                if (exceedsDeadband(lastApprovedQuaternion, candidatoQ)) {
-                    lastApprovedQuaternion = candidatoQ;
-                    return candidatoQ; 
-                }
+      let mapCoordinatesHistory = state.mapCoordinatesHistory;
+      if (shouldUpdateMap && isValidGps) {
+        const lastMapCoord = state.mapCoordinatesHistory.at(-1);
+        const hasMoved =
+          !lastMapCoord ||
+          lastMapCoord.latitude !== validCoordinates.latitude &&
+          lastMapCoord.longitude !== validCoordinates.longitude;
 
-                return state.orientacaoFoguete;
-            };
+        if (hasMoved) {
+          mapCoordinatesHistory = [
+            ...state.mapCoordinatesHistory,
+            validCoordinates,
+          ].slice(-MAX_MAP_POINTS);
+        }
+      }
 
-            return {
-                atual: { ...telemetria, timestamp: new Date().toLocaleTimeString() },
-                orientacaoFoguete: calcularOrientacao(),
-                contador: proximoContador,
-                isLive: true,
-                hasData: true,
-                posicaoAtual: novaPosicao,
-                posicaoInicial,
-                historicoMapaPosicao: novoHistoricoMapa,
-                historicoAltitude: atualizaGrafico
-                    ? [...state.historicoAltitude, { time: Math.round(telemetria.time / 1000), altitude: telemetria.kf_altitude / 10 }].slice(-MAX_PONTOS)
-                    : state.historicoAltitude,
-                historicoPosicao: atualizaGrafico
-                    ? [...state.historicoPosicao, novaPosicao].slice(-MAX_PONTOS)
-                    : state.historicoPosicao
-            };
-        });
-    }
+      const calculateOrientation = () => {
+        const { q1, q2, q3, q4 } = telemetry || {};
+
+        if (isInvalidQuaternion(q2, q3, q4, q1)) {
+          return state.rocketOrientation;
+        }
+
+        const candidateQuaternion = { x: q2, y: q3, z: q4, w: q1 };
+        if (exceedsDeadband(lastApprovedQuaternion, candidateQuaternion)) {
+          lastApprovedQuaternion = candidateQuaternion;
+          return candidateQuaternion;
+        }
+
+        return state.rocketOrientation;
+      };
+
+      return {
+        current: {
+          ...telemetry,
+          timestamp: new Date().toLocaleTimeString(),
+        },
+        rocketOrientation: calculateOrientation(),
+        isLive: true,
+        hasData: true,
+        currentCoordinates: validCoordinates,
+        initialCoordinates,
+        mapCoordinatesHistory,
+        altitudeHistory: shouldUpdateChart
+          ? [
+              ...state.altitudeHistory,
+              {
+                time: Math.round(telemetry.time / 1000),
+                altitude: telemetry.kf_altitude / 10,
+              },
+            ].slice(-MAX_POINTS)
+          : state.altitudeHistory,
+      };
+    });
+  },
 }));

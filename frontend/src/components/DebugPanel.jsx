@@ -50,7 +50,7 @@ function getVoltageThreshold(volts) {
 }
 
 export default function DebugPanel() {
-    const telemetry = useRowStore((state) => state.atual);
+    const telemetry = useRowStore((state) => state.current);
     const isLive = useRowStore((state) => state.isLive);
 
     if (!telemetry) {
