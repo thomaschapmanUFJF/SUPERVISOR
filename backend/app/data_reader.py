@@ -28,5 +28,8 @@ class DataReader:
 
     def get_package(self) -> dict:
         if self.use_mock_data:
-            return next(self._mock_generator)
+            item = next(self._mock_generator)
+            if isinstance(item, (bytes, str)):
+                return json.loads(item)
+            return item
         return self._read_serial()

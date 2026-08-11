@@ -5,10 +5,12 @@ import math
 import json
 import time as time_module
 from config.config import CONFIG
+import logging
 
 baudrate = CONFIG["serial"]["baudrate"]
 write_port_path = CONFIG["serial"]["write_port"]["path"]
 csv_path = CONFIG["csv"]["path"]
+logger = logging.getLogger(__name__)
 
 MAX_ACCEL = 255
 
@@ -95,17 +97,17 @@ def generate_telemetry():
             previous_altitude = altitude
             previous_time = time
 
-            yield values
+            yield json.dumps(values).encode('utf-8') + b'\n'
             time_module.sleep(0.05)
 
 def to_virtual_port():
     port = None
     try:
         port = serial.Serial(port=write_port_path, baudrate=baudrate, timeout=1)
-        for package in generate_packages():
+        for package in generate_telemetry():
             port.write(package)
     except KeyboardInterrupt:
-        print('INTERROMPENDO O SIMULADOR')
+        logger.info('Interrompendo o simulador...')
         sys.exit(0)
     finally:
         if port:
