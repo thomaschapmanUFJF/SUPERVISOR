@@ -19,6 +19,11 @@ timeout /t 2 /nobreak > NUL
 
 echo [3] Iniciando o Backend em modo HARDWARE (serial)...
 start "ESTACAO SOLO - Backend (Serial)" cmd /k "cd /d "%ROOT_DIR%\backend" && python main.py 0"
+timeout /t 2 /nobreak > NUL
+
+echo [4] Iniciando o Simulador de Telemetria (Porta Virtual)...
+:: Rodando como modulo para garantir que os imports da pasta config funcionem
+start "SIMULADOR - Foguete (Porta Virtual)" cmd /k "cd /d "%ROOT_DIR%\backend" && python -m mocks.telemetry_simulator"
 
 echo ==============================================
 echo Tudo pronto! Esta janela fechara em 5 segundos.

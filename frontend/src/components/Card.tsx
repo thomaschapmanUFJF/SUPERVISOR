@@ -1,13 +1,29 @@
-type CardProps = {
-    label: string,
-    children: React.ReactNode
-}
+import React from 'react';
 
-export default function Card(props: CardProps) {
-    return (
-        <div className="card">
-            <div className="card-label">{props.label}</div>
-            {props.children}
-        </div>
-    )
+export type CardProps = {
+  label?: string;
+  children: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  flex?: number | string;
+};
+
+export default function Card({
+  label,
+  children,
+  className = '',
+  style,
+  flex,
+}: CardProps) {
+  const combinedStyle: React.CSSProperties = {
+    ...(flex != null ? { flex } : {}),
+    ...style,
+  };
+
+  return (
+    <div className={`card ${className}`.trim()} style={combinedStyle}>
+      {label && <div className="card-label">{label}</div>}
+      <div className="card-body">{children}</div>
+    </div>
+  );
 }

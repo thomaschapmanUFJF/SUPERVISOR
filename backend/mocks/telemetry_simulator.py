@@ -93,19 +93,31 @@ def generate_telemetry():
                 'voltage':         int(float(row['Voltage']) * 10),
                 'fix':             0,
             }
-                    
+            encoded_string = json.dumps(values).encode('utf-8') + b'\n'
+            yield encoded_string
             previous_altitude = altitude
             previous_time = time
 
-            yield json.dumps(values).encode('utf-8') + b'\n'
+            
             time_module.sleep(0.05)
 
 def to_virtual_port():
     port = None
     try:
-        port = serial.Serial(port=write_port_path, baudrate=baudrate, timeout=1)
+        port = serial.Serial(
+            port=write_port_path, 
+            baudrate=baudrate, 
+            timeout=1, 
+            write_timeout=1
+        )
+        
         for package in generate_telemetry():
-            port.write(package)
+            try:
+                port.write(package)
+            except serial.SerialTimeoutException:
+                logger.warning("Port write timed out! Is the reader application connected?")
+                time_module.sleep(1)
+                
     except KeyboardInterrupt:
         logger.info('Interrompendo o simulador...')
         sys.exit(0)

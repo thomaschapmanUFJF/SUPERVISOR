@@ -1,26 +1,28 @@
-import { useMemo } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { useRowStore } from '../stores/useRowStore';
 import { useShallow } from 'zustand/react/shallow';
 import DataUnavailable from './DataUnavailable';
+import Card from './Card';
 
-export default function ChartPanel() {
+type ChartPanelProps = {
+  flex?: number | string;
+};
+
+export default function ChartPanel({ flex }: ChartPanelProps) {
   const hasData = useRowStore((state) => state.hasData);
   const altitudeHistory = useRowStore(useShallow((state) => state.altitudeHistory));
 
   if (!hasData) {
     return (
-      <div className="grafico-tela-wrap">
-        <div className="card-label">altitude / tempo</div>
+      <Card label="altitude / tempo" flex={flex}>
         <DataUnavailable />
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="grafico-tela-wrap">
-      <div className="card-label">altitude / tempo</div>
-      <div className="grafico-content">
+    <Card label="altitude / tempo" flex={flex}>
+      <div className="chart-content">
         <div className="area-chart-wrapper">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={altitudeHistory} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
@@ -40,14 +42,13 @@ export default function ChartPanel() {
                 tickFormatter={(val) => `${val}s`}
               />
               <YAxis stroke="#666" tick={{ fill: '#666', fontSize: 10 }} />
-              
-              {/* Tooltip 100% nativo estilizado via Props do Recharts */}
+
               <Tooltip
                 labelFormatter={(val) => `TEMPO: ${val}s`}
                 formatter={(val) => [`${val.toFixed(1)}m`, 'ALTITUDE']}
                 isAnimationActive={false}
                 cursor={{ stroke: 'rgba(191, 0, 255, 0.4)', strokeWidth: 1, strokeDasharray: '4 4' }}
-                
+
                 // Estilo da Caixa Externa (Card Escuro)
                 contentStyle={{
                   backgroundColor: 'rgba(15, 15, 22, 0.95)',
@@ -57,7 +58,7 @@ export default function ChartPanel() {
                   fontFamily: 'monospace',
                   padding: '8px 12px'
                 }}
-                
+
                 // Estilo do Título (Tempo)
                 labelStyle={{
                   color: 'rgba(255, 255, 255, 0.6)',
@@ -66,7 +67,7 @@ export default function ChartPanel() {
                   marginBottom: '2px',
                   textTransform: 'uppercase'
                 }}
-                
+
                 // Estilo do Valor (Altitude)
                 itemStyle={{
                   color: '#bf00ff',
@@ -89,6 +90,6 @@ export default function ChartPanel() {
           </ResponsiveContainer>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

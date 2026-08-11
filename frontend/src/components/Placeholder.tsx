@@ -1,12 +1,15 @@
-import Card from "./Card"
+import Card from "./Card";
 
-export default function Placeholder() {
-    return (
-        <Card label="placeholder">
-            <div className="placeholder-content">
-                <h1>placeholder</h1>
-            </div>
-        </Card>
+type PlaceholderProps = {
+  flex?: number | string;
+};
 
-    )
+export default function Placeholder({ flex }: PlaceholderProps) {
+  return (
+    <Card label="placeholder" flex={flex}>
+      <div className="placeholder-content">
+        <h1>placeholder</h1>
+      </div>
+    </Card>
+  );
 }

@@ -1,5 +1,5 @@
 import { useRowStore } from './stores/useRowStore';
-import AreaChart from './components/AreaChart'
+import AreaChart from './components/AreaChart';
 import RocketModel from './components/RocketModel';
 import DebugPanel from './components/DebugPanel';
 import FlightMap from './components/FlightMap';
@@ -7,6 +7,7 @@ import Placeholder from './components/Placeholder';
 import useErrorSSE from './hooks/useErrorSSE';
 import useRowSSE from './hooks/useRowSSE';
 import useErrorToast from './hooks/useErrorToast';
+
 function HeaderTime() {
   const time = useRowStore((state) => state.current?.time);
   const formattedTime = time != null && !isNaN(Number(time)) ? Math.round(Number(time)) : (time ?? 'N/A');
@@ -24,28 +25,16 @@ export default function MainScreen() {
     <div className="app-root">
       <main className="main-grid">
         <div className="top-row">
-
           <div className="col-telemetry">
             <DebugPanel />
           </div>
-
-          <div className="col-map">
-            <FlightMap />
-          </div>
-
-          <div className="col-3d">
-            <RocketModel />
-          </div>
+          <FlightMap />
+          <RocketModel />
         </div>
 
-        {/* PARTE INFERIOR: GRÁFICO E PLACEHOLDER LATERAIS */}
         <div className="bottom-row">
-          <section className="grafico-tela-wrap">
-            <AreaChart />
-          </section>
-
-                <Placeholder />
-
+          <AreaChart flex={2} />
+          <Placeholder />
         </div>
       </main>
 

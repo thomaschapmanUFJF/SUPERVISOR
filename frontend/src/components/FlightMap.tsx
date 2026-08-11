@@ -9,7 +9,11 @@ function getMetersPerLongitudeDegree(latitude) {
   return LAT_METERS_PER_DEGREE * Math.cos((latitude * Math.PI) / 180);
 }
 
-export default function FlightMap() {
+type FlightMapProps = {
+  flex?: number | string;
+};
+
+export default function FlightMap({ flex }: FlightMapProps) {
   const currentCoordinates = useRowStore((state) => state.currentCoordinates);
   const initialCoordinates = useRowStore((state) => state.initialCoordinates);
   const mapCoordinatesHistory = useRowStore(
@@ -23,7 +27,11 @@ export default function FlightMap() {
     (currentCoordinates.latitude !== 0 || currentCoordinates.longitude !== 0);
 
   if (!hasValidGps) {
-    return <DataUnavailable />;
+    return (
+      <Card label="rastreamento · GPS" flex={flex}>
+        <DataUnavailable />
+      </Card>
+    );
   }
 
   const startCoordinates = initialCoordinates || currentCoordinates;
@@ -70,8 +78,7 @@ export default function FlightMap() {
   }
 
   return (
-    <Card label="rastreamento · GPS">
-      <div className="mapa-wrap"></div>
+    <Card label="rastreamento · GPS" flex={flex}>
       <div
         style={{
           position: 'relative',

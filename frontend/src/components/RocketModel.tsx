@@ -5,6 +5,7 @@ import { useRowStore } from '../stores/useRowStore';
 import { isEqualQuaternion } from '../utils/deadband';
 import DataUnavailable from './DataUnavailable';
 import * as THREE from 'three';
+import Card from './Card';
 
 interface RocketOrientation {
   x?: number;
@@ -68,13 +69,16 @@ function RocketMesh() {
   );
 }
 
-export default function RocketModel() {
+type RocketModelProps = {
+  flex?: number | string;
+};
+
+export default function RocketModel({ flex }: RocketModelProps) {
   const hasData = useRowStore((state) => state.hasData);
   const canvasRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <section className="card card-3d">
-      <div className="card-label">orientação · IMU</div>
+    <Card label="orientação · IMU" flex={flex}>
       <div className="canvas-wrap" ref={canvasRef} style={{ flex: 1, minHeight: 0 }}>
         {!hasData ? (
           <DataUnavailable />
@@ -91,7 +95,7 @@ export default function RocketModel() {
           </Canvas>
         )}
       </div>
-    </section>
+    </Card>
   );
 }
 

@@ -45,10 +45,11 @@ def ingest_data(use_mock_data: bool = False):
         while True:
             try:
                 data = data_reader.get_package()
+                if data is None:
+                    continue
                 writer.writerow(data)
                 last_row.set(data)
 
-                # Reset consecutive timeout counter on success
                 consecutive_timeouts = 0
                 received_rows += 1
 

@@ -1,49 +1,43 @@
 import { useRowStore } from '../stores/useRowStore';
 import DataUnavailable from './DataUnavailable';
 import MetricCard from './MetricCard';
+import FormattedValue from './FormattedValue';
 
-function formatTime(timeMs) {
+function formatTime(timeMs: number | null) {
     if (timeMs == null || isNaN(Number(timeMs))) return <span className="value-main">N/A</span>;
     const totalSeconds = Math.floor(Number(timeMs) / 1000);
     const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
     const seconds = String(totalSeconds % 60).padStart(2, '0');
-    return <span className="value-main">{minutes}:{seconds}</span>;
+    return (
+        <FormattedValue mainValue={`${minutes}:${seconds}`} />
+    );
 }
 
-function formatAltitude(altitudeDm) {
+function formatAltitude(altitudeDm: number | null) {
     if (altitudeDm == null || isNaN(Number(altitudeDm))) return <span className="value-main">N/A</span>;
     const meters = Math.round(Number(altitudeDm) / 10);
     return (
-        <>
-            <span className="value-main">{meters}</span>
-            <span className="value-unit">m</span>
-        </>
+        <FormattedValue mainValue={meters} unit="m" />
     );
 }
 
-function formatVelocity(velDmS) {
+function formatVelocity(velDmS: number | null) {
     if (velDmS == null || isNaN(Number(velDmS))) return <span className="value-main">N/A</span>;
-    const mS = (Number(velDmS) / 10).toFixed(1);
+    const mS = Number((Number(velDmS) / 10).toFixed(1));
     return (
-        <>
-            <span className="value-main">{mS}</span>
-            <span className="value-unit">m/s</span>
-        </>
+        <FormattedValue mainValue={mS} unit="m/s" />
     );
 }
 
-function formatVoltage(voltageRaw) {
+function formatVoltage(voltageRaw: number | null) {
     if (voltageRaw == null || isNaN(Number(voltageRaw))) return <span className="value-main">N/A</span>;
-    const volts = Number(voltageRaw).toFixed(2);
+    const volts = Number(Number(voltageRaw).toFixed(2));
     return (
-        <>
-            <span className="value-main">{volts}</span>
-            <span className="value-unit">V</span>
-        </>
+        <FormattedValue mainValue={volts} unit="V" />
     );
 }
 
-function getVoltageThreshold(volts) {
+function getVoltageThreshold(volts: number | null) {
     if (volts == null) return 'metric-nominal';
     if (volts < 3.80) return 'metric-danger';
     if (volts < 3.85) return 'metric-warning';
@@ -55,7 +49,18 @@ export default function DebugPanel() {
     const isLive = useRowStore((state) => state.isLive);
 
     if (!telemetry) {
-        return <DataUnavailable />;
+        return (
+            <div className={`debug-panel ${isLive ? 'online' : 'offline'}`}>
+                <div className={`debug-header ${isLive ? 'online' : 'offline'}`}>
+                    <span className="debug-title">⬢ TELEMETRY</span>
+                    <div className="debug-status">
+                        {isLive && <span className="debug-dot"></span>}
+                        {isLive ? 'LIVE' : 'OFFLINE'}
+                    </div>
+                </div>
+                <DataUnavailable />
+            </div>
+        );
     }
 
     const batteryValue = telemetry?.voltage ?? telemetry?.voltage_int;
