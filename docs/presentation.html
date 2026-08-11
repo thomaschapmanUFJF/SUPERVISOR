@@ -1,0 +1,1030 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SUPERVISOR — Apresentação</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — copiados diretamente de base.css do próprio projeto
+   ============================================================ */
+:root{
+  --bg:#000;
+  --bg-card:#050505;
+  --bg-inset:#060606;
+  --bg-cell:#0d0d0d;
+  --border:#111;
+  --border-lit:#2a2a2a;
+  --accent:#bf00ff;
+  --accent-glow:rgba(191,0,255,.35);
+  --accent-dim:#3a0060;
+  --err:#ff2222;
+  --err-glow:rgba(255,34,34,.4);
+  --ok:#00ff41;
+  --ok-glow:rgba(0,255,65,.35);
+  --warn:#ffaa00;
+  --txt-pri:#f0f0f0;
+  --txt-sec:#666;
+  --txt-dim:#535353;
+  --font-mono:'Space Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:#000;color:var(--txt-pri);font-family:var(--font-mono);-webkit-font-smoothing:antialiased;}
+body{width:100vw;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--accent-dim);}
+
+/* ── deck shell ── */
+.deck{
+  width:100vw;height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(191,0,255,0.05), transparent 60%),
+    #000;
+}
+.slide{
+  width:1280px;height:720px;
+  background:var(--bg);
+  position:relative;
+  overflow:hidden;
+  display:none;
+  flex-direction:column;
+  border:1px solid var(--border-lit);
+  box-shadow:0 0 60px rgba(191,0,255,0.08);
+}
+.slide.active{display:flex;}
+.slide::before{ /* scanline texture, igual debug-panel::before */
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(191,0,255,0.015) 2px,rgba(191,0,255,0.015) 4px);
+}
+.slide > *{position:relative;z-index:1;}
+
+/* ── glow line, igual .glow-line ── */
+.glow-line{height:1px;border:none;background:var(--accent);box-shadow:0 0 8px 1px var(--accent-glow);flex-shrink:0;}
+
+/* ── header comum de slide ── */
+.s-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 40px 14px 40px;flex-shrink:0;
+}
+.s-eyebrow{
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--txt-dim);
+  display:flex;align-items:center;gap:10px;
+}
+.s-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+.s-title{
+  font-size:30px;font-weight:700;letter-spacing:-0.5px;color:var(--txt-pri);
+  margin-top:6px;
+}
+.s-title .hl{color:var(--accent);text-shadow:0 0 16px var(--accent-glow);}
+.s-num{font-size:11px;color:var(--txt-dim);letter-spacing:2px;}
+
+.s-body{flex:1;min-height:0;padding:6px 40px 20px 40px;display:flex;gap:28px;}
+
+/* ── tags, igual components/layout.css ── */
+.tag{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:2px;}
+.tag-purple{background:var(--accent);color:#000;font-weight:700;}
+.tag-outline{border:1px solid var(--border-lit);color:var(--txt-dim);}
+.tag-err{background:var(--err);color:#fff;font-weight:700;}
+.tag-ok{border:1px solid rgba(0,255,65,.35);color:var(--ok);}
+
+/* ── bevel, igual components.css ── */
+.bevel{border:1px solid var(--border-lit);box-shadow:inset 1px 1px 0 rgba(255,255,255,.06),inset -1px -1px 0 rgba(0,0,0,.8),0 2px 8px rgba(0,0,0,.6);}
+.bevel-inset{border:1px solid var(--border);box-shadow:inset 1px 1px 0 rgba(0,0,0,.9),inset -1px -1px 0 rgba(255,255,255,.03);}
+
+.card{background:var(--bg-card);padding:16px 18px;border-radius:2px;}
+.card-label{font-family:var(--font-mono);font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--txt-dim);margin-bottom:10px;}
+
+/* ── rodapé, réplica exata de bot-strip ── */
+.bot-strip{
+  background:var(--bg-card);border-top:1px solid var(--border);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+  padding:0 20px;display:flex;align-items:center;justify-content:space-between;
+  height:36px;flex-shrink:0;
+}
+.bs-group{display:flex;align-items:center;gap:20px;}
+.bs-status-badge{font-size:9px;font-weight:700;letter-spacing:2px;padding:2px 8px;border-radius:3px;display:flex;align-items:center;gap:6px;background:rgba(191,0,255,.15);color:var(--accent);border:1px solid rgba(191,0,255,.3);}
+.bs-live-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;box-shadow:0 0 6px var(--accent);animation:pulse-dot 1.5s ease-in-out infinite;}
+.bs-item{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-dim);display:flex;align-items:center;}
+.bs-val{color:var(--txt-pri);font-weight:700;margin-left:6px;}
+.bs-val.bs-time{color:var(--accent);font-size:11px;}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.3;transform:scale(.8);}}
+
+/* ── prosa ── */
+p.lead{font-size:15px;line-height:1.75;color:#cfcfcf;font-family:'Inter',sans-serif;font-family:var(--font-mono);}
+p.lead b{color:var(--txt-pri);}
+p.lead .accent{color:var(--accent);font-weight:700;}
+ul.blt{list-style:none;display:flex;flex-direction:column;gap:14px;}
+ul.blt li{font-size:14px;line-height:1.6;color:#d6d6d6;padding-left:18px;position:relative;}
+ul.blt li::before{content:'▸';position:absolute;left:0;color:var(--accent);}
+ul.blt li b{color:#fff;}
+ul.blt li .accent{color:var(--accent);font-weight:700;}
+.quote{
+  border-left:2px solid var(--accent);padding:8px 0 8px 16px;margin:10px 0;
+  font-size:13px;color:var(--txt-sec);font-style:normal;
+}
+
+/* ── layout helpers ── */
+.col{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;}
+.row{display:flex;gap:20px;}
+
+/* ============================================================
+   SLIDE 1 — comparativo bytes vs painel
+   ============================================================ */
+.byte-soup{
+  font-family:var(--font-mono);font-size:11px;line-height:1.9;color:#2a2a2a;
+  background:var(--bg-inset);padding:18px;height:100%;overflow:hidden;
+  word-break:break-all;
+}
+.byte-soup .hot{color:var(--accent);opacity:.5;}
+.arrow-big{
+  display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--accent);
+  text-shadow:0 0 14px var(--accent-glow);width:60px;flex-shrink:0;
+}
+.mini-dash{display:flex;flex-direction:column;gap:10px;height:100%;}
+.mini-row{display:flex;gap:10px;flex:1;min-height:0;}
+.mini-metric{flex:1;background:rgba(0,0,0,.65);border-radius:4px;padding:10px 12px;display:flex;flex-direction:column;justify-content:center;gap:4px;border:1px solid rgba(0,255,65,.25);}
+.mini-key{font-size:8px;letter-spacing:1px;color:rgba(0,255,65,.7);font-weight:700;}
+.mini-val{font-size:16px;font-weight:700;color:#00ff41;text-shadow:0 0 8px rgba(0,255,65,.35);}
+.mini-val span{font-size:9px;color:rgba(0,255,65,.8);margin-left:3px;}
+.mini-chart{flex:1.4;background:var(--bg-inset);border:1px solid var(--border);position:relative;}
+.mini-chart svg{width:100%;height:100%;display:block;}
+
+/* ============================================================
+   SLIDE 2 — pipeline flight.csv
+   ============================================================ */
+.pipe{display:flex;align-items:stretch;gap:0;height:100%;}
+.pipe-node{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  padding:20px;position:relative;
+}
+.pipe-node .box{
+  background:var(--bg-card);border:1px solid var(--border-lit);border-radius:4px;
+  padding:16px 20px;text-align:center;width:100%;
+  box-shadow:inset 1px 1px 0 rgba(255,255,255,.06),inset -1px -1px 0 rgba(0,0,0,.8);
+}
+.pipe-node .box.hl{border-color:var(--accent);box-shadow:0 0 16px var(--accent-glow), inset 1px 1px 0 rgba(255,255,255,.06);}
+.pipe-node .box i{display:block;font-size:20px;color:var(--accent);margin-bottom:8px;}
+.pipe-node .box .name{font-size:13px;font-weight:700;color:#fff;}
+.pipe-node .box .sub{font-size:9px;color:var(--txt-sec);margin-top:4px;letter-spacing:1px;text-transform:uppercase;}
+.pipe-arrow{width:40px;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:22px;flex-shrink:0;}
+
+/* ============================================================
+   SLIDE 3 — schema.json
+   ============================================================ */
+.code-block{
+  background:var(--bg-inset);border:1px solid var(--border);border-radius:2px;
+  padding:16px 18px;font-size:12px;line-height:1.75;height:100%;overflow:hidden;
+  box-shadow:inset 1px 1px 0 rgba(0,0,0,.9),inset -1px -1px 0 rgba(255,255,255,.03);
+}
+.code-block .k{color:#7dd3fc;}
+.code-block .s{color:#a3e635;}
+.code-block .n{color:var(--accent);}
+.code-block .c{color:var(--txt-dim);}
+.code-block .removed{color:#5a5a5a;text-decoration:line-through;}
+
+/* ============================================================
+   SLIDE 4 — anatomia do frame
+   ============================================================ */
+.frame-anatomy{display:flex;gap:0;align-items:stretch;}
+.frame-byte{
+  flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:16px 10px;border-right:1px dashed var(--border-lit);
+}
+.frame-byte:last-child{border-right:none;}
+.frame-byte .chip{
+  font-size:11px;font-weight:700;letter-spacing:1px;color:#000;background:var(--accent);
+  padding:6px 12px;border-radius:2px;white-space:nowrap;
+}
+.frame-byte.payload .chip{background:var(--ok);}
+.frame-byte.crc .chip{background:var(--err);color:#fff;}
+.frame-byte .lbl{font-size:9px;color:var(--txt-sec);letter-spacing:1px;text-transform:uppercase;}
+.frame-byte .val{font-size:9px;color:var(--txt-dim);}
+
+.thread-card{flex:1;background:var(--bg-card);border:1px solid var(--border-lit);border-radius:4px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;}
+.thread-card .th-title{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+
+/* ============================================================
+   SLIDE 5 — SSE vs WebSocket
+   ============================================================ */
+.vs-wrap{display:flex;gap:24px;height:100%;}
+.vs-card{flex:1;border-radius:4px;padding:20px 22px;display:flex;flex-direction:column;gap:12px;}
+.vs-card.no{background:rgba(255,34,34,.04);border:1px solid rgba(255,34,34,.3);}
+.vs-card.yes{background:rgba(0,255,65,.04);border:1px solid rgba(0,255,65,.3);}
+.vs-card .vs-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px;}
+.vs-card.no .vs-title{color:var(--err);}
+.vs-card.yes .vs-title{color:var(--ok);}
+.vs-flow{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0;font-size:11px;color:var(--txt-sec);}
+.vs-node{background:var(--bg-inset);border:1px solid var(--border-lit);padding:8px 14px;border-radius:3px;font-size:11px;color:#ddd;}
+.bi-arrow{color:var(--err);font-size:16px;}
+.uni-arrow{color:var(--ok);font-size:16px;}
+
+/* ============================================================
+   SLIDE 6 — zustand
+   ============================================================ */
+.store-diagram{display:flex;align-items:center;gap:30px;height:100%;justify-content:center;}
+.store-box{
+  background:var(--bg-card);border:1px solid var(--accent);border-radius:6px;padding:24px 26px;
+  box-shadow:0 0 24px var(--accent-glow);text-align:center;flex-shrink:0;
+}
+.store-box .lbl{font-size:13px;font-weight:700;color:var(--accent);letter-spacing:1px;}
+.store-box .sub{font-size:9px;color:var(--txt-sec);margin-top:6px;letter-spacing:1px;text-transform:uppercase;}
+.store-rays{display:flex;flex-direction:column;gap:14px;}
+.store-ray{display:flex;align-items:center;gap:10px;}
+.store-ray .line{width:50px;height:1px;background:var(--border-lit);position:relative;}
+.store-ray.active .line{background:var(--accent);box-shadow:0 0 6px var(--accent-glow);}
+.consumer{background:var(--bg-inset);border:1px solid var(--border-lit);border-radius:3px;padding:8px 14px;font-size:11px;color:#ccc;min-width:150px;}
+.consumer.active{border-color:var(--accent);color:#fff;}
+.consumer .pick{font-size:8px;color:var(--txt-dim);display:block;margin-top:2px;}
+.consumer.active .pick{color:var(--accent);}
+
+/* ============================================================
+   SLIDE 7 — grid componentes reais
+   ============================================================ */
+.comp-grid{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(2,1fr);gap:14px;flex:1;min-height:0;}
+.comp-card{background:var(--bg-card);border:1px solid var(--border-lit);border-radius:3px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;overflow:hidden;}
+.comp-card .cc-name{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1px;flex-shrink:0;}
+.comp-card .cc-desc{font-size:9.5px;color:var(--txt-sec);line-height:1.45;flex-shrink:0;}
+.comp-card .cc-visual{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;}
+.dados-indisponiveis-mini{display:flex;align-items:center;justify-content:center;flex:1;color:var(--txt-sec);font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+.mini-metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;height:100%;}
+.mini-metric-cell{background:rgba(0,0,0,.65);border:1px solid rgba(0,255,65,.25);border-radius:3px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:4px 8px;}
+.mini-metric-cell .k{font-size:7px;color:rgba(0,255,65,.7);font-weight:700;letter-spacing:1px;}
+.mini-metric-cell .v{font-size:13px;color:#00ff41;font-weight:700;text-shadow:0 0 6px rgba(0,255,65,.35);}
+.mini-metric-cell .v span{font-size:7px;color:rgba(0,255,65,.8);margin-left:2px;}
+.mini-metric-cell.warn{border-color:rgba(255,170,0,.4);}
+.mini-metric-cell.warn .k{color:rgba(255,170,0,.8);}
+.mini-metric-cell.warn .v{color:#ffaa00;text-shadow:0 0 6px rgba(255,170,0,.4);}
+.mini-gnss{width:100%;height:100%;background:#1a1a24;border-radius:2px;position:relative;overflow:hidden;}
+.mini-gnss svg{width:100%;height:100%;display:block;}
+.mini-3d{width:100%;height:100%;background:var(--bg-inset);border:1px solid var(--border);border-radius:2px;}
+.mini-3d svg{width:100%;height:100%;display:block;}
+
+/* ============================================================
+   SLIDE 8 — final
+   ============================================================ */
+.final-flow{display:flex;align-items:center;justify-content:center;gap:14px;margin:22px 0;flex-wrap:wrap;}
+.final-node{background:var(--bg-card);border:1px solid var(--accent);border-radius:4px;padding:12px 18px;font-size:12px;font-weight:700;color:#fff;box-shadow:0 0 10px var(--accent-glow);}
+.final-arrow{color:var(--accent);font-size:16px;}
+
+/* ============================================================
+   SLIDE 9 — start.bat vs test.bat
+   ============================================================ */
+.bat-wrap{display:flex;gap:24px;flex:1;}
+.bat-card{flex:1;background:var(--bg-card);border:1px solid var(--border-lit);border-radius:4px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;}
+.bat-card .bat-title{font-size:14px;font-weight:700;color:var(--accent);letter-spacing:1px;display:flex;align-items:center;gap:8px;}
+.bat-windows{display:flex;flex-direction:column;gap:6px;margin-top:4px;}
+.bat-win{background:var(--bg-inset);border:1px solid var(--border);border-radius:3px;padding:6px 10px;font-size:10.5px;color:#ccc;display:flex;align-items:center;gap:8px;}
+.bat-win i{width:14px;height:14px;border:1px solid var(--border-lit);border-radius:2px;flex-shrink:0;display:inline-block;}
+.bat-win.off{opacity:.35;text-decoration:line-through;}
+.future-card{background:rgba(191,0,255,.05);border:1px dashed var(--accent);border-radius:4px;padding:14px 18px;display:flex;align-items:flex-start;gap:12px;margin-top:auto;}
+.future-card .fc-tag{flex-shrink:0;}
+.future-card p{font-size:12px;color:#ddd;line-height:1.6;}
+
+/* ============================================================
+   SLIDE 10 — aprendizados
+   ============================================================ */
+.learn-grid{display:flex;gap:24px;flex:1;}
+.learn-col{flex:1;display:flex;flex-direction:column;gap:12px;}
+.learn-col .lc-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--txt-dim);border-bottom:1px solid var(--border-lit);padding-bottom:8px;}
+
+/* ============================================================
+   SLIDE 11 — bugs
+   ============================================================ */
+.bug-grid{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(2,1fr);gap:14px;flex:1;min-height:0;}
+.bug-card{background:var(--bg-card);border:1px solid var(--border-lit);border-radius:3px;padding:14px 16px;display:flex;flex-direction:column;gap:6px;overflow:hidden;}
+.bug-card.major{border-color:rgba(255,34,34,.4);background:rgba(255,34,34,.03);grid-row:span 1;}
+.bug-card .bg-title{font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;justify-content:space-between;}
+.bug-card .bg-desc{font-size:10.5px;color:var(--txt-sec);line-height:1.55;flex:1;}
+.bug-card .bg-status{font-size:8.5px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:2px;align-self:flex-start;}
+.bg-status.solved{background:rgba(0,255,65,.12);color:var(--ok);border:1px solid rgba(0,255,65,.3);}
+.bg-status.mitigated{background:rgba(255,170,0,.12);color:var(--warn);border:1px solid rgba(255,170,0,.3);}
+
+/* ============================================================
+   SLIDES 8/9 — decisões de design da interface
+   ============================================================ */
+.design-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;flex:1;min-height:0;}
+.design-card{background:var(--bg-card);border:1px solid var(--border-lit);border-radius:4px;padding:14px 18px;display:flex;gap:14px;align-items:flex-start;box-shadow:inset 1px 1px 0 rgba(255,255,255,.05),inset -1px -1px 0 rgba(0,0,0,.8);}
+.design-card .dc-icon{
+  flex-shrink:0;width:38px;height:38px;border-radius:50%;
+  background:rgba(191,0,255,.08);border:1px solid var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;line-height:1;white-space:nowrap;color:var(--accent);text-shadow:0 0 8px var(--accent-glow);
+}
+.design-card .dc-body{flex:1;min-width:0;}
+.design-card .dc-title{font-size:12.5px;font-weight:700;color:#fff;letter-spacing:.3px;margin-bottom:5px;}
+.design-card .dc-desc{font-size:10.5px;color:var(--txt-sec);line-height:1.55;}
+.design-card .dc-desc b{color:#ddd;}
+.design-card .dc-desc code{font-size:.9em;}
+
+/* ============================================================
+   SLIDE 10 (aprendizados) — cards com ícone
+   ============================================================ */
+.skill-grid{display:flex;flex-direction:column;gap:9px;}
+.skill-card{background:var(--bg-card);border:1px solid var(--border-lit);border-radius:3px;padding:9px 12px;display:flex;gap:10px;align-items:flex-start;}
+.skill-card .sk-icon{flex-shrink:0;width:22px;height:22px;border-radius:4px;background:rgba(191,0,255,.1);border:1px solid rgba(191,0,255,.35);display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;white-space:nowrap;color:var(--accent);}
+.skill-card .sk-text{font-size:11.5px;line-height:1.5;color:#d6d6d6;}
+.skill-card .sk-text b{color:#fff;}
+.learn-col.process .sk-icon{background:rgba(255,170,0,.1);border-color:rgba(255,170,0,.4);color:var(--warn);}
+
+/* ============================================================
+   SLIDE 11 (bugs) — ícone por card
+   ============================================================ */
+.bug-card .bg-head{display:flex;align-items:center;gap:8px;}
+.bug-card .bg-icon{
+  flex-shrink:0;width:24px;height:24px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;font-size:13px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border-lit);color:#ccc;
+}
+.bug-card.major .bg-icon{border-color:rgba(255,34,34,.5);color:var(--err);background:rgba(255,34,34,.08);}
+
+/* ============================================================
+   SLIDE 12 — vivência
+   ============================================================ */
+.viv-wrap{display:flex;flex-direction:column;gap:18px;flex:1;justify-content:center;}
+.viv-tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+code{font-family:var(--font-mono);color:var(--accent);background:rgba(191,0,255,.08);padding:1px 5px;border-radius:2px;font-size:.95em;}
+.nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;gap:8px;z-index:50;}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:var(--border-lit);cursor:pointer;transition:.2s;}
+.nav-dot.on{background:var(--accent);box-shadow:0 0 8px var(--accent-glow);}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);z-index:50;background:rgba(5,5,5,.7);border:1px solid var(--border-lit);color:var(--txt-sec);width:40px;height:40px;border-radius:50%;cursor:pointer;font-family:var(--font-mono);font-size:16px;display:flex;align-items:center;justify-content:center;}
+.nav-btn:hover{color:var(--accent);border-color:var(--accent);}
+#prev{left:24px;} #next{right:24px;}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ================= SLIDE 1 ================= -->
+<section class="slide active" id="s1">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>SUPERVISÓRIO · SUPERNOVA</div>
+      <div class="s-title">O que é o <span class="hl">SUPERVISOR</span></div>
+    </div>
+    <div class="s-num">01 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="col" style="flex:1.1">
+      <p class="lead">O sistema recebe, via <b>rádio LoRa</b>, um grande volume de <b>bytes brutos</b> — em ambientes críticos, durante o voo do foguete.</p>
+      <p class="lead">O <span class="accent">SUPERVISOR</span> tem como propósito converter esses dados em informação <b>visualizável em tempo real</b>, permitindo que o operador tome decisões com mais agilidade.</p>
+      <ul class="blt">
+        <li><b>O problema:</b> dados brutos, de difícil leitura, recebidos em tempo real</li>
+        <li><b>A solução:</b> conversão, tratamento e visualização contínua</li>
+        <li><b>O objetivo:</b> <span class="accent">apoiar a tomada de decisão do operador</span> durante o voo</li>
+      </ul>
+    </div>
+    <div class="arrow-big">→</div>
+    <div class="col" style="flex:1.4">
+      <div class="row" style="flex:1;min-height:0;">
+        <div class="byte-soup bevel-inset" style="flex:1;">
+          AA FF 01 1C 00 00 03 E8 42 <span class="hot">C8</span> 00 00 41 20 00 00 00 32 <span class="hot">1E</span> 00 3F 80 00 00 3F 00<br>
+          00 00 3E 99 <span class="hot">99</span> 9A 3F 4C CC CD 05 01 03 01 42 48 00 00 3F <span class="hot">00</span> 00 00<br>
+          00 3F 40 00 00 12 <span class="hot">AC</span> AA FF 01 1C 00 00 03 <span class="hot">EA</span> 42 C9 00 00 41<br>
+          21 00 00 00 32 1F 00 3F 80 <span class="hot">1A</span> 00 3F 00 01 00 3E 99 9A <span class="hot">9B</span><br>
+          3F 4C CC CE 05 01 03 01 42 48 <span class="hot">01</span> 00 3F 00 00 01 3F 40 01 00 13
+        </div>
+        <div class="mini-dash" style="width:230px;flex-shrink:0;">
+          <div class="mini-row">
+            <div class="mini-metric"><span class="mini-key">TIME</span><span class="mini-val">02:14</span></div>
+            <div class="mini-metric"><span class="mini-key">ALT</span><span class="mini-val">842<span>m</span></span></div>
+          </div>
+          <div class="mini-row">
+            <div class="mini-metric"><span class="mini-key">VEL</span><span class="mini-val">31.4<span>m/s</span></span></div>
+            <div class="mini-metric"><span class="mini-key">BATT</span><span class="mini-val">4.01<span>V</span></span></div>
+          </div>
+          <div class="mini-chart bevel-inset">
+            <svg viewBox="0 0 200 90" preserveAspectRatio="none">
+              <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stop-color="#bf00ff" stop-opacity="0.4"/>
+                <stop offset="95%" stop-color="#bf00ff" stop-opacity="0"/>
+              </linearGradient></defs>
+              <path d="M0,80 L20,70 L40,55 L60,58 L80,40 L100,28 L120,32 L140,18 L160,20 L180,8 L200,10 L200,90 L0,90 Z" fill="url(#g1)"/>
+              <path d="M0,80 L20,70 L40,55 L60,58 L80,40 L100,28 L120,32 L140,18 L160,20 L180,8 L200,10" fill="none" stroke="#bf00ff" stroke-width="1.5"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group">
+      <span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span>
+      <span class="bs-item">SUPERVISÓRIO <span class="bs-val">SUPERNOVA</span></span>
+    </div>
+    <div class="bs-group"><span class="tag tag-outline">DE BYTES A DECISÕES</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 2 ================= -->
+<section class="slide" id="s2">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>CENÁRIO DE TESTE</div>
+      <div class="s-title">Simulando um voo <span class="hl">de verdade</span></div>
+    </div>
+    <div class="s-num">02 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body" style="flex-direction:column;gap:16px;">
+    <div class="row" style="flex:1;">
+      <div class="col">
+        <p class="lead">Para tornar o projeto mais realista, foram utilizados dados de voos anteriores, fornecidos pelo mentor do projeto. O arquivo <b>flight.csv</b> serviu de base para os testes.</p>
+        <p class="lead">Foi desenvolvido um script (<b>teste.py</b>) que lê o CSV linha por linha e envia os dados como se fosse a transmissão do rádio, em tempo real.</p>
+        <p class="lead">O desafio foi simular uma <b>porta serial real</b> no Windows 11 — foi criada uma <b>porta virtual</b> para que o restante do sistema não percebesse diferença entre o ambiente de teste e o hardware real.</p>
+      </div>
+      <div class="col" style="flex:0.9;">
+        <div class="pipe bevel" style="border-radius:6px;">
+          <div class="pipe-node">
+            <div class="box"><i>▤</i><div class="name">flight.csv</div><div class="sub">dados reais de voo</div></div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-node">
+            <div class="box hl"><i>⚙</i><div class="name">teste.py</div><div class="sub">leitura linha a linha</div></div>
+          </div>
+          <div class="pipe-arrow">→</div>
+          <div class="pipe-node">
+            <div class="box"><i>▮</i><div class="name">porta virtual</div><div class="sub">com0com · Windows 11</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span><span class="bs-item">MODO <span class="bs-val">TESTE</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">HARDWARE SIMULADO</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 3 ================= -->
+<section class="slide" id="s3">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>ARQUITETURA</div>
+      <div class="s-title">O tradutor: <span class="hl">schema.json</span></div>
+    </div>
+    <div class="s-num">03 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="col" style="flex:1;">
+      <p class="lead">Do ponto de vista técnico, esse é o componente fundacional do projeto: é onde toda a estrutura do pacote binário é definida, de forma genérica e configurável.</p>
+      <ul class="blt">
+        <li><b>Modularidade:</b> futuros usuários do SUPERVISOR podem alterar ordem, tipo e presença de cada campo <span class="accent">sem alterar o código-fonte</span></li>
+        <li><b>Otimização:</b> campos de menor relevância — como <i>pressure</i>, <i>rotation</i>, <i>accel_y</i> — podem ser removidos sem impactar o restante do sistema</li>
+      </ul>
+    </div>
+    <div class="col" style="flex:1.2;">
+      <div class="code-block">
+<span class="c">// schema.json — payload</span><br>
+{<br>
+&nbsp;&nbsp;<span class="k">"time"</span>: <span class="s">"uint32"</span>,<br>
+&nbsp;&nbsp;<span class="k">"latitude"</span>: <span class="s">"float32"</span>,<br>
+&nbsp;&nbsp;<span class="k">"longitude"</span>: <span class="s">"float32"</span>,<br>
+&nbsp;&nbsp;<span class="k">"altitude"</span>: <span class="s">"uint16"</span>,<br>
+&nbsp;&nbsp;<span class="k">"apogeu"</span>: <span class="s">"uint16"</span>,<br>
+&nbsp;&nbsp;<span class="k">"vel_vertical"</span>: <span class="s">"int16"</span>,<br>
+&nbsp;&nbsp;<span class="k">"qw"</span>/<span class="k">"qx"</span>/<span class="k">"qy"</span>/<span class="k">"qz"</span>: <span class="s">"float32"</span>,<br>
+&nbsp;&nbsp;<span class="k">"voltage_int"</span>: <span class="s">"uint8"</span>,<br>
+&nbsp;&nbsp;<span class="removed">"pressure": "float32",</span><br>
+&nbsp;&nbsp;<span class="removed">"rotation": "float32",</span><br>
+&nbsp;&nbsp;<span class="removed">"accel_y": "float32"</span> <span class="c">// candidatos a sair</span><br>
+}
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="tag tag-purple">CONFIGURÁVEL</span><span class="bs-item">ARQUIVO <span class="bs-val">schema.json</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">SETOR ELETRÔNICA</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 4 ================= -->
+<section class="slide" id="s4">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>BACKEND</div>
+      <div class="s-title">Backend: threads de <span class="hl">processamento</span> e envio</div>
+    </div>
+    <div class="s-num">04 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body" style="flex-direction:column;gap:14px;">
+    <div class="card bevel-inset" style="padding:10px 16px;">
+      <div class="card-label" style="margin-bottom:8px;">anatomia do frame</div>
+      <div class="frame-anatomy">
+        <div class="frame-byte"><div class="chip">AA FF</div><div class="lbl">SYNC</div><div class="val">2 bytes fixos</div></div>
+        <div class="frame-byte"><div class="chip">TYPE</div><div class="lbl">1 byte</div></div>
+        <div class="frame-byte"><div class="chip">LENGTH</div><div class="lbl">1 byte</div></div>
+        <div class="frame-byte payload"><div class="chip">PAYLOAD</div><div class="lbl">N bytes</div><div class="val">definido no schema</div></div>
+        <div class="frame-byte crc"><div class="chip">CRC</div><div class="lbl">2 bytes</div><div class="val">verificação de integridade</div></div>
+      </div>
+    </div>
+    <div class="row" style="flex:1;">
+      <div class="thread-card">
+        <div class="th-title">⬢ THREAD 1 — DECODIFICAÇÃO (MENSAGEIRO)</div>
+        <p class="lead" style="font-size:12.5px;">Realiza a leitura do buffer bruto, localiza o sync, valida o CRC contra corrupção e, em caso positivo, decodifica o payload em um objeto <b>row</b> tipado.</p>
+        <div class="row" style="gap:8px;margin-top:auto;">
+          <span class="tag tag-outline">frame_utils.py</span>
+          <span class="tag tag-outline">mensageiro.py</span>
+        </div>
+      </div>
+      <div class="thread-card">
+        <div class="th-title">⬢ THREAD 2 — SERVER.PY</div>
+        <p class="lead" style="font-size:12.5px;">Recebe o objeto <b>row</b> já decodificado e o entrega ao frontend, sem lógica adicional de processamento.</p>
+        <div class="row" style="gap:8px;margin-top:auto;">
+          <span class="tag tag-outline">server.py</span>
+          <span class="tag tag-purple">→ SSE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span><span class="bs-item">CRC <span class="bs-val">OK</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">MULTI-THREAD</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 5 ================= -->
+<section class="slide" id="s5">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>COMUNICAÇÃO</div>
+      <div class="s-title">Por que <span class="hl">SSE</span>, e não WebSocket</div>
+    </div>
+    <div class="s-num">05 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="vs-wrap" style="flex:1;">
+      <div class="vs-card no">
+        <div class="vs-title">✕ WebSocket</div>
+        <div class="vs-flow"><div class="vs-node">Backend</div><span class="bi-arrow">⇄</span><div class="vs-node">Frontend</div></div>
+        <p class="lead" style="font-size:12.5px;">Mantém uma conexão bidirecional aberta, mesmo quando o frontend não precisa enviar dados de volta — um custo de recurso desnecessário para esse caso de uso.</p>
+      </div>
+      <div class="vs-card yes">
+        <div class="vs-title">✓ Server-Sent Events</div>
+        <div class="vs-flow"><div class="vs-node">Backend</div><span class="uni-arrow">→</span><div class="vs-node">Frontend</div></div>
+        <p class="lead" style="font-size:12.5px;">Comunicação unidirecional, mais leve, com <b>reconexão automática</b> nativa do protocolo — adequada ao caso de uso atual e às necessidades futuras do projeto.</p>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="tag tag-purple">SSE</span><span class="bs-item">CUSTO DE REDE <span class="bs-val">MENOR</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">server.py → frontend</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 6 ================= -->
+<section class="slide" id="s6">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>FRONTEND</div>
+      <div class="s-title">Estado global com <span class="hl">Zustand</span></div>
+    </div>
+    <div class="s-num">06 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="col" style="flex:1;">
+      <p class="lead">Isoladamente, o React re-renderiza a árvore de componentes inteira a cada novo dado de telemetria recebido — mesmo quando um componente depende apenas de <i>uma fatia</i> do estado.</p>
+      <p class="lead">Com <span class="accent">Zustand</span>, cada componente assina apenas o que precisa. O gráfico de altitude, por exemplo, não é notificado quando a longitude é atualizada.</p>
+      <div class="quote">Resultado: menos re-renderizações desnecessárias e melhor uso de memória e taxa de quadros (FPS).</div>
+    </div>
+    <div class="col" style="flex:1.3;">
+      <div class="store-diagram">
+        <div class="store-box"><div class="lbl">useRowStore</div><div class="sub">zustand · global</div></div>
+        <div class="store-rays">
+          <div class="store-ray active"><div class="line"></div><div class="consumer active">AreaChart<span class="pick">historicoAltitude</span></div></div>
+          <div class="store-ray"><div class="line"></div><div class="consumer">FlightMap<span class="pick">posicaoAtual</span></div></div>
+          <div class="store-ray active"><div class="line"></div><div class="consumer active">DebugPanel<span class="pick">atual · isLive</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="tag tag-purple">useShallow</span><span class="bs-item">RE-RENDER <span class="bs-val">SELETIVO</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">stores/useRowStore.js</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 7 ================= -->
+<section class="slide" id="s7">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>INTERFACE</div>
+      <div class="s-title">Componentes do <span class="hl">dashboard</span></div>
+    </div>
+    <div class="s-num">07 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="comp-grid">
+      <div class="comp-card" style="grid-column:span 2;">
+        <div class="cc-name">AreaChart</div>
+        <div class="cc-desc">Histórico de altitude ao longo do tempo, renderizado via Recharts com <b>useShallow</b>.</div>
+        <div class="cc-visual">
+          <svg viewBox="0 0 200 90" preserveAspectRatio="none" style="width:100%;height:100%;">
+            <defs><linearGradient id="g7a" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stop-color="#bf00ff" stop-opacity="0.4"/>
+              <stop offset="95%" stop-color="#bf00ff" stop-opacity="0"/>
+            </linearGradient></defs>
+            <line x1="0" y1="20" x2="200" y2="20" stroke="#222" stroke-dasharray="3 3"/>
+            <line x1="0" y1="45" x2="200" y2="45" stroke="#222" stroke-dasharray="3 3"/>
+            <line x1="0" y1="70" x2="200" y2="70" stroke="#222" stroke-dasharray="3 3"/>
+            <path d="M0,82 L15,75 L30,68 L45,70 L60,55 L75,42 L90,44 L105,30 L120,20 L135,24 L150,14 L165,18 L180,10 L200,12 L200,90 L0,90 Z" fill="url(#g7a)"/>
+            <path d="M0,82 L15,75 L30,68 L45,70 L60,55 L75,42 L90,44 L105,30 L120,20 L135,24 L150,14 L165,18 L180,10 L200,12" fill="none" stroke="#bf00ff" stroke-width="1.5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="comp-card" style="grid-column:span 2;">
+        <div class="cc-name">DebugPanel</div>
+        <div class="cc-desc">Painel de monitoramento de erros e alertas, com limites de atenção e perigo. Limiares hoje ainda hardcoded.</div>
+        <div class="cc-visual">
+          <div class="mini-metric-grid">
+            <div class="mini-metric-cell"><span class="k">TIME</span><span class="v">02:14</span></div>
+            <div class="mini-metric-cell"><span class="k">ALT</span><span class="v">842<span>m</span></span></div>
+            <div class="mini-metric-cell"><span class="k">VEL</span><span class="v">31.4<span>m/s</span></span></div>
+            <div class="mini-metric-cell warn"><span class="k">BATT</span><span class="v">3.82<span>V</span></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="comp-card" style="grid-column:span 2;">
+        <div class="cc-name">RocketModel</div>
+        <div class="cc-desc">Modelo 3D (react-three-fiber) orientado pelo quaternion do payload.</div>
+        <div class="cc-visual">
+          <div class="mini-3d">
+            <svg viewBox="0 0 200 100">
+              <line x1="100" y1="80" x2="100" y2="10" stroke="#333" stroke-width="1"/>
+              <line x1="100" y1="80" x2="150" y2="90" stroke="#333" stroke-width="1"/>
+              <line x1="100" y1="80" x2="60" y2="95" stroke="#333" stroke-width="1"/>
+              <g transform="translate(105,45) rotate(18)">
+                <polygon points="0,-32 8,-6 8,20 -8,20 -8,-6" fill="none" stroke="#bf00ff" stroke-width="1.6"/>
+                <polygon points="0,-32 8,-6 -8,-6" fill="#bf00ff" fill-opacity="0.25"/>
+                <polygon points="-8,20 8,20 12,30 -12,30" fill="none" stroke="#bf00ff" stroke-width="1.3"/>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="comp-card" style="grid-column:span 3;">
+        <div class="cc-name">FlightMap</div>
+        <div class="cc-desc">Estilo <b>GNSS</b> — plota deslocamento a partir do ponto de partida, zoom automático.</div>
+        <div class="cc-visual">
+          <div class="mini-gnss">
+            <svg viewBox="0 0 200 90">
+              <line x1="0" y1="45" x2="200" y2="45" stroke="#2a2a38" stroke-width="1"/>
+              <line x1="100" y1="0" x2="100" y2="90" stroke="#2a2a38" stroke-width="1"/>
+              <path d="M100,45 L112,38 L119,26 L131,15 L150,8" fill="none" stroke="#bf00ff" stroke-width="1.4" stroke-dasharray="2 2" opacity="0.6"/>
+              <circle cx="100" cy="45" r="4" fill="#00ff88" style="filter:drop-shadow(0 0 4px #00ff88)"/>
+              <circle cx="150" cy="8" r="4" fill="#bf00ff" style="filter:drop-shadow(0 0 4px #bf00ff)"/>
+            </svg>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="display:flex;align-items:center;gap:4px;font-size:8px;color:#ccc;"><span style="width:7px;height:7px;border-radius:50%;background:#00ff88;box-shadow:0 0 6px #00ff88;display:inline-block;"></span>START</span>
+          <span style="display:flex;align-items:center;gap:4px;font-size:8px;color:#ccc;"><span style="width:7px;height:7px;border-radius:50%;background:#bf00ff;box-shadow:0 0 6px #bf00ff;display:inline-block;"></span>FOGUETE</span>
+        </div>
+      </div>
+      <div class="comp-card" style="grid-column:span 3;">
+        <div class="cc-name">DataUnavailable</div>
+        <div class="cc-desc">Estado de fallback — aparece em qualquer painel sem dados válidos ainda.</div>
+        <div class="cc-visual">
+          <div class="dados-indisponiveis-mini">Aguardando dados<span class="loading-dots">...</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span><span class="bs-item">SUPERVISÓRIO <span class="bs-val">SUPERNOVA</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">5 COMPONENTES</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 8 (novo) ================= -->
+<section class="slide" id="s8">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>DESIGN DE INTERFACE · 1/2</div>
+      <div class="s-title">Decisões de <span class="hl">design</span> (I)</div>
+    </div>
+    <div class="s-num">08 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="design-grid">
+      <div class="design-card">
+        <div class="dc-icon">▦</div>
+        <div class="dc-body">
+          <div class="dc-title">Razão dado-tinta (Tufte)</div>
+          <div class="dc-desc">Todo elemento visual deve transmitir informação útil. As variáveis numéricas brutas de <b>latitude</b> e <b>longitude</b> foram omitidas do painel principal, já que a visualização espacial do <b>FlightMap</b> já provê esse contexto de forma nativa.</div>
+        </div>
+      </div>
+      <div class="design-card">
+        <div class="dc-icon">⧗</div>
+        <div class="dc-body">
+          <div class="dc-title">Amostragem temporizada</div>
+          <div class="dc-desc">A alta taxa de pacotes gerava múltiplos pontos repetidos no eixo do tempo do gráfico de altitude (ex.: vários "85s" seguidos). A amostragem de exibição foi ajustada para intervalos de <b>8 pacotes</b>, eliminando a redundância no eixo.</div>
+        </div>
+      </div>
+      <div class="design-card">
+        <div class="dc-icon">⊕</div>
+        <div class="dc-body">
+          <div class="dc-title">GNSS relativo ao ponto de partida</div>
+          <div class="dc-desc">O rastreamento GNSS é representado de forma <b>vetorial em relação à base de lançamento</b>, e não apenas como coordenadas absolutas — tornando direta a leitura do deslocamento real a partir do ponto de origem (Start).</div>
+        </div>
+      </div>
+      <div class="design-card">
+        <div class="dc-icon">▢</div>
+        <div class="dc-body">
+          <div class="dc-title">Controle autônomo do viewport</div>
+          <div class="dc-desc">O zoom autoajustável nativo de bibliotecas como o <b>Leaflet</b> foi intencionalmente descartado, mantendo o controle total do comportamento da tela pela equipe e evitando saltos visuais indesejados durante o voo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span><span class="bs-item">INTERFACE <span class="bs-val">DASHBOARD</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">4 DE 8 PRINCÍPIOS</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 9 (novo) ================= -->
+<section class="slide" id="s9">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>DESIGN DE INTERFACE · 2/2</div>
+      <div class="s-title">Decisões de <span class="hl">design</span> (II)</div>
+    </div>
+    <div class="s-num">09 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="design-grid">
+      <div class="design-card">
+        <div class="dc-icon">∿</div>
+        <div class="dc-body">
+          <div class="dc-title">Simplificação das visualizações temporais</div>
+          <div class="dc-desc">A alternância entre gráfico de área e gráfico de barras foi removida da interface em prol de uma <b>representação contínua</b> (linha/área), reduzindo a complexidade cognitiva e mantendo o foco na parábola de altitude.</div>
+        </div>
+      </div>
+      <div class="design-card">
+        <div class="dc-icon">◭</div>
+        <div class="dc-body">
+          <div class="dc-title">Minimalismo no modelo 3D</div>
+          <div class="dc-desc">Manteve-se uma renderização 3D <b>sólida e limpa</b> para o vetor de orientação do foguete, descartando-se o wireframe originalmente cogitado por criar texturas densas. A opacidade de ticks e elementos secundários também foi reduzida.</div>
+        </div>
+      </div>
+      <div class="design-card">
+        <div class="dc-icon">Aa</div>
+        <div class="dc-body">
+          <div class="dc-title">Hierarquia visual e tipografia funcional</div>
+          <div class="dc-desc">Altitude, velocidade e nível de bateria — dados de maior prioridade — receberam destaque tipográfico primário. Foi adotada uma fonte numérica <b>tabular (monospace)</b>, evitando o jitter horizontal quando os valores oscilam rapidamente.</div>
+        </div>
+      </div>
+      <div class="design-card">
+        <div class="dc-icon">⛶</div>
+        <div class="dc-body">
+          <div class="dc-title">Layout de tela única</div>
+          <div class="dc-desc">O painel foi estruturado sob a restrição rigorosa de ocupar <b>uma única tela</b> (100vh/100vw, sem barras de rolagem), com layout flexível e responsivo que preenche o espaço disponível independentemente da quantidade de cards ativos.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span><span class="bs-item">INTERFACE <span class="bs-val">DASHBOARD</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">8 DE 8 PRINCÍPIOS</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 10 (era 8) ================= -->
+<section class="slide" id="s10">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>ENCERRAMENTO</div>
+      <div class="s-title">Considerações finais & <span class="hl">próximos passos</span></div>
+    </div>
+    <div class="s-num">10 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body" style="flex-direction:column;justify-content:center;">
+    <div class="final-flow">
+      <div class="final-node">Rádio LoRa</div><span class="final-arrow">→</span>
+      <div class="final-node">Backend</div><span class="final-arrow">→</span>
+      <div class="final-node">SSE</div><span class="final-arrow">→</span>
+      <div class="final-node">Dashboard 3D</div>
+    </div>
+    <div class="row" style="justify-content:center;gap:40px;margin-top:10px;">
+      <div class="col" style="flex:none;width:340px;">
+        <p class="lead" style="font-size:13px;"><b>Ganhos de engenharia:</b></p>
+        <ul class="blt">
+          <li>Robustez via CRC</li>
+          <li>Flexibilidade via <b>schema.json</b></li>
+          <li>Performance de render no React</li>
+        </ul>
+      </div>
+      <div class="col" style="flex:none;width:340px;">
+        <p class="lead" style="font-size:13px;"><b>Próximos passos:</b></p>
+        <ul class="blt">
+          <li>Remoção completa dos valores <i>hardcoded</i></li>
+          <li>Migração dos limiares de alerta para o <b>schema.json</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span><span class="bs-item">MISSÃO <span class="bs-val">MSN-2026</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">OBRIGADA</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 9 ================= -->
+<section class="slide" id="s11">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>OPERAÇÃO</div>
+      <div class="s-title">Inicialização: modo <span class="hl">start</span> ou <span class="hl">teste</span></div>
+    </div>
+    <div class="s-num">11 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body" style="flex-direction:column;gap:14px;">
+    <div class="bat-wrap">
+      <div class="bat-card">
+        <div class="bat-title">⬢ start.bat</div>
+        <p class="lead" style="font-size:12px;">Inicialização completa, com leitura de porta serial real (<code>pyserial</code>). Abre quatro janelas:</p>
+        <div class="bat-windows">
+          <div class="bat-win"><i></i>Backend — thread do motor + servidor FastAPI</div>
+          <div class="bat-win"><i></i>test.py — processo separado, porta serial virtual</div>
+          <div class="bat-win"><i></i>Servidor de desenvolvimento do frontend</div>
+          <div class="bat-win"><i></i>Página web local de visualização</div>
+        </div>
+      </div>
+      <div class="bat-card">
+        <div class="bat-title">⬢ test.bat</div>
+        <p class="lead" style="font-size:12px;">Mesmo script, com <code>test_mode=true</code> passado como argumento inicial. Dispensa o <code>test.py</code> como processo à parte — três janelas:</p>
+        <div class="bat-windows">
+          <div class="bat-win"><i></i>Backend — <code>test_mode</code> ativo, sem porta serial</div>
+          <div class="bat-win"><i></i>Servidor de desenvolvimento do frontend</div>
+          <div class="bat-win"><i></i>Página web local de visualização</div>
+          <div class="bat-win off"><i></i>test.py separado (não necessário)</div>
+        </div>
+        <div class="future-card">
+          <span class="tag tag-purple fc-tag">FUTURO</span>
+          <p>Criar um <b>setup.bat</b> específico para quem só vai rodar em <b>test.bat</b>, dispensando o download da biblioteca <b>pyserial</b> — hoje isolada em um bloco <code>else</code> do <b>Mensageiro</b>, mas ainda instalada por padrão no setup atual.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="tag tag-purple">test_mode</span><span class="bs-item">SCRIPTS <span class="bs-val">.BAT</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">AUTOMAÇÃO DE INICIALIZAÇÃO</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 10 ================= -->
+<section class="slide" id="s12">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>REFLEXÃO</div>
+      <div class="s-title">O que foi <span class="hl">aprendido</span></div>
+    </div>
+    <div class="s-num">12 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="learn-grid">
+      <div class="learn-col">
+        <div class="lc-title">Conhecimento técnico</div>
+        <div class="skill-grid">
+          <div class="skill-card"><div class="sk-icon">▮</div><div class="sk-text">Comunicação serial e portas virtuais</div></div>
+          <div class="skill-card"><div class="sk-icon">{ }</div><div class="sk-text">Empacotamento/desempacotamento binário com <b>struct</b></div></div>
+          <div class="skill-card"><div class="sk-icon">⧉</div><div class="sk-text">Geração dinâmica de classes a partir de um esquema de dados</div></div>
+          <div class="skill-card"><div class="sk-icon">⇄</div><div class="sk-text">Integração real entre backend e frontend, além de construir cada um isoladamente</div></div>
+          <div class="skill-card"><div class="sk-icon">◭</div><div class="sk-text">Representação 3D e o motivo prático de preferir <b>quatérnios</b> a ângulos de Euler</div></div>
+          <div class="skill-card"><div class="sk-icon">⬢</div><div class="sk-text">Automação simples com scripts <b>.bat</b> para orquestrar a inicialização do sistema</div></div>
+        </div>
+      </div>
+      <div class="learn-col process">
+        <div class="lc-title">Lições de processo</div>
+        <div class="skill-grid">
+          <div class="skill-card"><div class="sk-icon">↻</div><div class="sk-text">Nem tudo evoluiu de forma linear — houve retrabalho</div></div>
+          <div class="skill-card"><div class="sk-icon">⚠</div><div class="sk-text">Arquitetura de testes precisou ser refeita ao perceber dados simulados artificialmente limpos</div></div>
+          <div class="skill-card"><div class="sk-icon">⌘</div><div class="sk-text">Rodar o projeto em outra máquina forçou simplificação e unificação de classes antes tidas como necessárias</div></div>
+          <div class="skill-card"><div class="sk-icon">◆</div><div class="sk-text">Responsabilidade real por um sistema usado por outras pessoas é uma motivação diferente de projetos pessoais ou acadêmicos</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span><span class="bs-item">CONCLUSÃO</span></div>
+    <div class="bs-group"><span class="tag tag-outline">APRENDIZADO APLICADO</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 11 ================= -->
+<section class="slide" id="s13">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>DIFICULDADES TÉCNICAS</div>
+      <div class="s-title">Bugs <span class="hl">encontrados</span></div>
+    </div>
+    <div class="s-num">13 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="bug-grid">
+      <div class="bug-card">
+        <div class="bg-head"><div class="bg-icon">⚠</div><div class="bg-title">Tipo de CRC incorreto<span class="tag tag-err">CRÍTICO</span></div></div>
+        <div class="bg-desc">Introduzido durante uma refatoração, quebrou a validação de pacotes até ser identificado.</div>
+        <span class="bg-status solved">Resolvido</span>
+      </div>
+      <div class="bug-card">
+        <div class="bg-head"><div class="bg-icon">⧗</div><div class="bg-title">Validação em máquina virtual</div></div>
+        <div class="bg-desc">Ambiente virtualizado exigiu ciclos manuais de <code>git push</code>/<code>git pull</code> a cada alteração — pouco produtivo, consumiu horas sem necessidade.</div>
+        <span class="bg-status mitigated">Contornado</span>
+      </div>
+      <div class="bug-card">
+        <div class="bg-head"><div class="bg-icon">▣</div><div class="bg-title">Dependências NPM / Python</div></div>
+        <div class="bg-desc">Gestão de versões de dependências e caminho de instalação do Python exigiram ajustes manuais recorrentes.</div>
+        <span class="bg-status mitigated">Contornado</span>
+      </div>
+      <div class="bug-card major">
+        <div class="bg-head"><div class="bg-icon">◭</div><div class="bg-title">Foguete deitado no modelo 3D<span class="tag tag-err">PERSISTENTE</span></div></div>
+        <div class="bg-desc">Orientação incorreta do modelo, independente dos dados recebidos. Hipótese: eixo Z tratado como "para cima" em vez do eixo Y — causa raiz não confirmada. Corrigido com uma rotação fixa de 90° no eixo Z.</div>
+        <span class="bg-status mitigated">Dívida técnica em aberto</span>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span><span class="bs-item">4 CASOS <span class="bs-val">DOCUMENTADOS</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">ANÁLISE CRÍTICA</span></div>
+  </div>
+</section>
+
+<!-- ================= SLIDE 12 ================= -->
+<section class="slide" id="s14">
+  <div class="s-head">
+    <div>
+      <div class="s-eyebrow"><span class="dot"></span>CULTURA ORGANIZACIONAL</div>
+      <div class="s-title">Vivência na <span class="hl">Supernova</span></div>
+    </div>
+    <div class="s-num">14 / 14</div>
+  </div>
+  <div class="glow-line"></div>
+  <div class="s-body">
+    <div class="viv-wrap">
+      <p class="lead">Além dos aspectos técnicos, a experiência no ambiente físico de desenvolvimento da equipe — a "salinha" — foi central para o processo de integração à equipe.</p>
+      <p class="lead">O espaço equilibra produtividade focada e descanso necessário, sem o atrito de ambientes rígidos nem a dispersão de informalidades descontroladas.</p>
+      <div class="quote">A inserção ocorreu de forma natural, em contraste com dinâmicas acadêmicas por vezes mais punitivas — pautada por confiança mútua, incentivo contínuo e autonomia.</div>
+      <div class="viv-tags">
+        <span class="tag tag-outline">CONFIANÇA MÚTUA</span>
+        <span class="tag tag-outline">AUTONOMIA</span>
+        <span class="tag tag-outline">SUPORTE ENTRE PARES</span>
+        <span class="tag tag-outline">INCENTIVO DA LIDERANÇA</span>
+      </div>
+    </div>
+  </div>
+  <div class="bot-strip">
+    <div class="bs-group"><span class="bs-status-badge"><span class="bs-live-dot"></span>LIVE</span><span class="bs-item">EQUIPE <span class="bs-val">SUPERNOVA</span></span></div>
+    <div class="bs-group"><span class="tag tag-outline">FIM</span></div>
+  </div>
+</section>
+
+</div>
+
+<button class="nav-btn" id="prev">‹</button>
+<button class="nav-btn" id="next">›</button>
+<div class="nav" id="navDots"></div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+let current = 0;
+const dotsWrap = document.getElementById('navDots');
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'nav-dot' + (i === 0 ? ' on' : '');
+  d.addEventListener('click', () => go(i));
+  dotsWrap.appendChild(d);
+});
+function go(i){
+  slides[current].classList.remove('active');
+  dotsWrap.children[current].classList.remove('on');
+  current = (i + slides.length) % slides.length;
+  slides[current].classList.add('active');
+  dotsWrap.children[current].classList.add('on');
+}
+document.getElementById('prev').addEventListener('click', () => go(current - 1));
+document.getElementById('next').addEventListener('click', () => go(current + 1));
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') go(current + 1);
+  if (e.key === 'ArrowLeft') go(current - 1);
+});
+</script>
+</body>
+</html>
