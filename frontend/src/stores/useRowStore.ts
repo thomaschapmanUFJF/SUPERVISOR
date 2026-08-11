@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { isInvalidQuaternion, exceedsDeadband } from '../utils/deadband';
+import { isInvalidQuaternion, exceedsDeadband, QuaternionProperties } from '../utils/deadband';
+import { Quaternion } from 'three';
 
 const MAX_POINTS = 50;
 const MAX_MAP_POINTS = 1000;
@@ -7,12 +8,34 @@ const MAX_MAP_POINTS = 1000;
 const MAP_THROTTLE = 300; // ms
 const CHART_THROTTLE = 500; // ms
 
-let liveTimeout = null;
-let lastApprovedQuaternion = null;
+type Coordinate = {
+  latitude: number,
+  longitude: number
+};
+
+type AltitudeChartAttributes = {
+  time: number,
+  altitude: number
+};
+
+type RowState = {
+  current: Record<string, any> | null,
+  rocketOrientation: Quaternion | QuaternionProperties | null,
+  currentCoordinates: Coordinate | null,
+  initialCoordinates: Coordinate | null,
+  altitudeHistory: AltitudeChartAttributes[],
+  mapCoordinatesHistory: Coordinate[],
+  isLive: boolean,
+  hasData: boolean,
+  addTelemetry: (telemetry: Record<string, any>) => void,
+};
+
+let liveTimeout: number | null = null;
+let lastApprovedQuaternion: Quaternion | QuaternionProperties | null = null;
 let lastMapUpdateTime = 0;
 let lastChartUpdateTime = 0;
 
-export const useRowStore = create((set) => ({
+export const useRowStore = create<RowState>((set) => ({
   // State
   current: null,
   rocketOrientation: null,
@@ -52,10 +75,10 @@ export const useRowStore = create((set) => ({
         const lastMapCoord = state.mapCoordinatesHistory.at(-1);
         const hasMoved =
           !lastMapCoord ||
-          lastMapCoord.latitude !== validCoordinates.latitude &&
-          lastMapCoord.longitude !== validCoordinates.longitude;
+          lastMapCoord.latitude !== validCoordinates!.latitude &&
+          lastMapCoord.longitude !== validCoordinates!.longitude;
 
-        if (hasMoved) {
+        if (hasMoved && validCoordinates) {
           mapCoordinatesHistory = [
             ...state.mapCoordinatesHistory,
             validCoordinates,
@@ -92,12 +115,12 @@ export const useRowStore = create((set) => ({
         mapCoordinatesHistory,
         altitudeHistory: shouldUpdateChart
           ? [
-              ...state.altitudeHistory,
-              {
-                time: Math.round(telemetry.time / 1000),
-                altitude: telemetry.kf_altitude / 10,
-              },
-            ].slice(-MAX_POINTS)
+            ...state.altitudeHistory,
+            {
+              time: Math.round(telemetry.time / 1000),
+              altitude: telemetry.kf_altitude / 10,
+            },
+          ].slice(-MAX_POINTS)
           : state.altitudeHistory,
       };
     });

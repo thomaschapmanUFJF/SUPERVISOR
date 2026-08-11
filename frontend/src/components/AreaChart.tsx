@@ -38,9 +38,8 @@ export default function ChartPanel() {
                 tickLine={{ stroke: '#333', opacity: 0.4 }}
                 interval={8}
                 tickFormatter={(val) => `${val}s`}
-                isAnimationActive={false}
               />
-              <YAxis stroke="#666" tick={{ fill: '#666', fontSize: 10 }} isAnimationActive={false} />
+              <YAxis stroke="#666" tick={{ fill: '#666', fontSize: 10 }} />
               
               {/* Tooltip 100% nativo estilizado via Props do Recharts */}
               <Tooltip

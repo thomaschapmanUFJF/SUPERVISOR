@@ -1,5 +1,6 @@
 import { useRowStore } from '../stores/useRowStore';
 import DataUnavailable from './DataUnavailable';
+import MetricCard from './MetricCard';
 
 function formatTime(timeMs) {
     if (timeMs == null || isNaN(Number(timeMs))) return <span className="value-main">N/A</span>;
@@ -74,22 +75,10 @@ export default function DebugPanel() {
             </div>
 
             <div className="debug-grid">
-                <div className="metric-card metric-nominal">
-                    <span className="debug-key">TIME</span>
-                    <div className="debug-value">{formatTime(telemetry.time)}</div>
-                </div>
-                <div className="metric-card metric-nominal">
-                    <span className="debug-key">ALT</span>
-                    <div className="debug-value">{formatAltitude(altitudeValue)}</div>
-                </div>
-                <div className="metric-card metric-nominal">
-                    <span className="debug-key">VEL</span>
-                    <div className="debug-value">{formatVelocity(velocityValue)}</div>
-                </div>
-                <div className={`metric-card ${getVoltageThreshold(battery)}`}>
-                    <span className="debug-key">BATT</span>
-                    <div className="debug-value">{formatVoltage(battery)}</div>
-                </div>
+                <MetricCard label="TIME" value={formatTime(telemetry.time)} />
+                <MetricCard label="ALT" value={formatAltitude(altitudeValue)} />
+                <MetricCard label="VEL" value={formatVelocity(velocityValue)} />
+                <MetricCard label="BATT" value={formatVoltage(battery)} threshold={getVoltageThreshold(battery)} />
             </div>
 
             <div className="debug-timestamp">

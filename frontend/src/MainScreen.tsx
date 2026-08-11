@@ -8,7 +8,7 @@ import useErrorSSE from './hooks/useErrorSSE';
 import useRowSSE from './hooks/useRowSSE';
 import useErrorToast from './hooks/useErrorToast';
 function HeaderTime() {
-  const time = useRowStore((state) => state.atual?.time);
+  const time = useRowStore((state) => state.current?.time);
   const formattedTime = time != null && !isNaN(Number(time)) ? Math.round(Number(time)) : (time ?? 'N/A');
   return <span>{formattedTime}</span>;
 }

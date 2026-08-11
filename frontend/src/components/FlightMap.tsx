@@ -1,6 +1,7 @@
 import { useRowStore } from '../stores/useRowStore';
 import { useShallow } from 'zustand/react/shallow';
 import DataUnavailable from './DataUnavailable';
+import Card from './Card';
 
 const LAT_METERS_PER_DEGREE = 111320;
 
@@ -63,15 +64,14 @@ export default function FlightMap() {
 
   const gridStepMeters =
     range <= 25 ? 5 : range <= 100 ? 25 : range <= 500 ? 100 : 250;
-  const gridSteps = [];
+  const gridSteps: number[] = [];
   for (let meters = gridStepMeters; meters < range; meters += gridStepMeters) {
     gridSteps.push(meters);
   }
 
   return (
-<section className="card card-mapa">
-  <div className="card-label">rastreamento · GPS</div>
-  <div className="mapa-wrap"></div>    
+    <Card label="rastreamento · GPS">
+      <div className="mapa-wrap"></div>
       <div
         style={{
           position: 'relative',
@@ -303,6 +303,6 @@ export default function FlightMap() {
           </div>
         </div>
       </div>
-    </section>
+    </Card>
   );
 }
